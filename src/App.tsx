@@ -187,7 +187,13 @@ export default function App() {
             </>
           ) : outcome && !outcome.ok ? (
             <p className="summary alert" role="alert">{outcome.reason}</p>
-          ) : null}
+          ) : (
+            <>
+              <p className="lead">{from ? `You are at ${from.title}. Choose where to go.` : 'Scan a booth’s QR code, or tell us where you are.'}</p>
+              <p className="hint">This single-level floor has no stairs, so all three route types are step-free. Wheelchair routes keep extra clearance.</p>
+              <p className="hint"><a href={`/v/${venue.id}/qr`}>Venue staff: QR codes to print</a></p>
+            </>
+          )}
         </div>
       </section>
 
