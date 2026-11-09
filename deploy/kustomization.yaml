@@ -11,4 +11,4 @@ resources:
 images:
   - name: app
     newName: ghcr.io/chandlerbuilds/navcon
-    newTag: "f4059f4"
+    newTag: "01144e0"
