@@ -92,5 +92,5 @@ This block is the only part of the file that is edited in place. Update it whene
 
 ### 16:36 · Plan moves to the bottom sheet on phones · PR #13
 - **By:** Bruce, with Claude
-- **What changed:** Interface only. On phones, From, To, swap and route type sit in the bottom sheet above the directions, within reach of a thumb; the top keeps a slim brand bar. The empty-state text under the map is removed, including the "Venue staff: QR codes to print" link (`/v/<venue>/qr` still works). Split out of the in-app scanner pull request, which needs its own approval.
+- **What changed:** Interface only. On phones, From, To, swap and route type sit in the bottom sheet above the directions, within reach of a thumb; the top keeps a slim brand bar. The whole sheet scrolls when it is taller than the screen. Split out of the in-app scanner pull request, which needs its own approval.
 - **State:** Open
