@@ -19,8 +19,19 @@ First venue: KubeCon + CloudNativeCon North America 2026, Solutions Showcase (23
 | --- | --- | --- |
 | Elasticsearch | `api/search.ts`, `tools/index_places.mjs` | Typo-tolerant and meaning-based place search |
 | Dash0 | `src/telemetry.ts`, Vercel log drain | Sessions, errors, custom events (`qr_scan`, `search`, `route_requested`, ...) |
-| Radar | `src/radar.ts`, `src/ui/ArrivalSheet.tsx`, `tools/radar_geofence.mjs` | "Getting here": venue map, address lookup, on-site geofence check, walking time to the venue |
-| Gitar | this repository | Reviews pull requests and repairs failing CI, including the routing checks |
+| Radar | `deploy/`, `argocd/application.yaml`, `Dockerfile`, `server.mjs` | Navcon runs on Kubernetes in the team namespace on the `lunzerr` cluster in Radar Cloud. Every push to `main` rolls out through Argo CD (see Deploy below). |
+| Gitar | `.gitar/review/`, `.github/workflows/ci.yml` | Reviews every pull request against the project's conventions and routing rules, and repairs failing CI, including the routing checks |
+
+The optional "Getting here" screen (`src/radar.ts`, `src/ui/ArrivalSheet.tsx`, `tools/radar_geofence.mjs`) uses the location SDK from radar.com. That is a different product from the Radar Kubernetes UI above and is not one of the sponsor integrations. The screen stays hidden unless `VITE_RADAR_KEY` is set.
+
+## AI assistance
+
+The team built Navcon with AI coding assistants, as the hackathon rules ask us to disclose:
+
+- **Claude (Anthropic)** wrote most of the code and documentation, working from the team's product spec and routing rules. The commit history shows which commits it authored.
+- **Gitar** reviews pull requests and proposes fixes for failing CI.
+
+The team set the product design and the routing rules, reviewed the changes through pull requests, and checked the result on real venue data.
 
 ## Develop
 
