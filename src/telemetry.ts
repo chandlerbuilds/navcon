@@ -9,7 +9,13 @@ let enabled = false;
 export function initTelemetry(): void {
   if (!url || !token) return;
   try {
-    init({ serviceName: 'navcon-pwa', endpoint: { url, authToken: token } });
+    init({
+      serviceName: 'navcon-pwa',
+      // Lets the dashboard separate local runs from the live site.
+      environment: import.meta.env.MODE,
+      deploymentName: location.hostname,
+      endpoint: { url, authToken: token },
+    });
     enabled = true;
   } catch (err) {
     console.warn('telemetry disabled', err);
