@@ -4,7 +4,8 @@ What changed, when, and whether it is live. One entry per merged pull request or
 
 How to keep it:
 
-- Add a new entry at the **end** of the log. Never rewrite or delete an old entry, except to correct a fact.
+- Add a new entry at the **end** of the file. Never rewrite or delete an old entry, except to correct a fact.
+- The "Current status" block below is the one exception: it is a snapshot, so edit it in place.
 - A pull request that changes what the app does, or how it is built or deployed, adds its own entry in the same pull request.
 - Use the entry shape below. Times are Mountain Time.
 - "State" is one of: **Live** (on the deployed sites), **Merged** (on `main`, nothing for users to see), **Built, off** (in the code but switched off), **Open** (pull request not merged).
@@ -17,6 +18,20 @@ How to keep it:
 ```
 
 The product spec is `docs/SPEC.md`. The spec says what Navcon should be; this log says what has actually happened.
+
+## Current status
+
+This block is the only part of the file that is edited in place. Update it whenever something merges or goes live, and change the time. Last updated 15:35.
+
+**Open pull requests**
+
+- **PR #3 · Arc bows upward, no vendor names during a route, `CLAUDE.md` and `docs/SPEC.md`.** Approved by Sean. Not merged.
+- **PR #6 · Gitar demo.** Lowers one routing cost on purpose, which fails the check "diagonal leg in a square hall". Gitar diagnosed it and asked for the routing code to be put back. Do not merge while CI is red.
+
+**Not live yet**
+
+- **Elasticsearch search.** The cluster has credentials but its search requests fail, most likely because the venue has not been indexed (`npm run index:places`). The app falls back to on-device search. Vercel has no credentials.
+- **Dash0 telemetry.** Neither live build has a Dash0 endpoint. Waiting on `VITE_DASH0_ENDPOINT` and `VITE_DASH0_TOKEN` as GitHub repository variables, then a rebuild.
 
 ## 2026-11-09 (hackathon day)
 
@@ -49,16 +64,3 @@ The product spec is `docs/SPEC.md`. The spec says what Navcon should be; this lo
 - **By:** Chandler, with Claude. Reviewed by Sean and Gitar.
 - **What changed:** `.gitar/review/` now holds the routing rules and team conventions that Gitar reviews every pull request against. The README describes the right Radar, and discloses AI assistant use as the hackathon rules require.
 - **State:** Merged
-
-## Open at 15:30
-
-These are not on `main`. Each gets its own dated entry above when it merges.
-
-- **PR #3 · Arc bows upward, no vendor names during a route, `CLAUDE.md` and `docs/SPEC.md`.** Approved by Sean. Not merged.
-- **PR #6 · Gitar demo.** Lowers one routing cost on purpose, which fails the check "diagonal leg in a square hall". Gitar diagnosed it and asked for the routing code to be put back. Do not merge while CI is red.
-
-## Not live yet at 15:30
-
-- **Elasticsearch search.** Both sites answer `{"configured":false}`. Waiting on the URL and API key from Sean, the `app-credentials` Secret on the cluster, and one run of `npm run index:places`.
-- **Dash0 telemetry.** Neither live build has a Dash0 endpoint. Waiting on `VITE_DASH0_ENDPOINT` and `VITE_DASH0_TOKEN` as GitHub repository variables, then a rebuild.
-- **Radar evidence for the demo.** Bruce's agent is connected to Radar's MCP server. An AI investigation of the running app has not been reported yet.

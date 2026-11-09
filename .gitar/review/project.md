@@ -49,4 +49,4 @@ One change per pull request, with a description that says what was checked. A ch
 
 ## Feature log
 
-`docs/FEATURE_LOG.md` records what changed and whether it is live. A pull request that changes what the app does, or how it is built or deployed, adds one entry at the end of the log, in the shape the log describes. Flag such a pull request when it has no entry. Flag any pull request that rewrites or deletes an existing entry, unless it says it is correcting a fact.
+`docs/FEATURE_LOG.md` records what changed and whether it is live. A pull request that changes what the app does, or how it is built or deployed, adds one entry at the end of the file, in the shape the log describes. Flag such a pull request when it has no entry. Flag any pull request that rewrites or deletes an existing entry, unless it says it is correcting a fact. The "Current status" block near the top is a snapshot and is meant to be edited in place.
