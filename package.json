@@ -14,6 +14,7 @@
   "dependencies": {
     "@dash0/sdk-web": "^0.30.0",
     "@radarlabs/plugin-maps": "^1.2.0",
+    "jsqr": "^1.4.0",
     "maplibre-gl": "^6.17.0",
     "qrcode": "^1.5.4",
     "radar-sdk-js": "^5.2.0",

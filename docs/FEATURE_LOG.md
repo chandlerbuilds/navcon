@@ -78,3 +78,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Bruce, with Claude. Reviewed by Gitar.
 - **What changed:** Interface only; routing and search behave as before. On phones the route plan sits in a card above the map and the directions in a sheet below it; on wide screens both move to a column beside the map. The navy header is gone, From and To share one box, route types are a segmented control, and the directions lead with distance and walking time. Icons are drawn instead of text characters. Every control is at least 44 px tall.
 - **State:** Open
+
+### 16:28 · Scan a booth's QR code inside the app; plan moves to the bottom · PR #10
+- **By:** Bruce, with Claude
+- **What changed:** A QR button in the From field opens the camera inside the app. Scanning a booth's code fills in where you are; codes for other venues or other sites are refused, not opened. On phones, From, To and the route type now sit in the bottom sheet above the directions, within reach of a thumb; the top keeps a slim brand bar. The empty-state text under the map is gone. The spec previously said "no in-app scanner"; `docs/SPEC.md` is updated.
+- **State:** Open
