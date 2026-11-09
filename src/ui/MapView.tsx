@@ -171,7 +171,8 @@ export function MapView({ venue, route, from, to }: Props) {
           {venue.points.filter((p) => p.kind === 'hall').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl hall">{p.name.toUpperCase()}</text>
           ))}
-          {detail >= 1 && areas.map(({ a, c, tall, w }) => (
+          {/* during a route, sponsor-named areas that are not part of it lose their name too; plain facilities keep theirs */}
+          {detail >= 1 && areas.filter(({ a }) => !(route && lit && !lit.has(a.id) && (a.kind === 'lounge' || (a.kind === 'food' && !a.name.startsWith('Meal'))))).map(({ a, c, tall, w }) => (
             <text key={a.id} x={c[0]} y={c[1]} className={`lbl area-name${lit && !lit.has(a.id) ? ' dim' : ''}`}
               transform={tall ? `rotate(-90 ${c[0]} ${c[1]})` : undefined} style={{ fontSize: Math.max(1.1, Math.min(2.4, w / (a.name.length * 0.62))) }}>
               {a.name.replace(/ \(.*\)$/, '')}
@@ -180,10 +181,11 @@ export function MapView({ venue, route, from, to }: Props) {
           {detail >= 1 && venue.points.filter((p) => p.kind === 'restroom' || p.kind === 'entrance').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{p.kind === 'restroom' ? 'WC' : '▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
           ))}
+          {/* booth numbers stay during a route; vendor names are removed so only the route's own labels remain */}
           {detail >= 2 && booths.map(({ b, c, font, big }) => (
             <text key={b.id} x={c[0]} y={c[1]} className={`lbl num${lit && !lit.has(b.id) ? ' dim' : ''}`} style={{ fontSize: font }}>
               {b.number}
-              {big && b.name && <tspan x={c[0]} dy={font * 0.95} style={{ fontSize: font * 0.5 }}>{b.name.length > 16 ? b.name.slice(0, 15) + '…' : b.name}</tspan>}
+              {big && b.name && !route && <tspan x={c[0]} dy={font * 0.95} style={{ fontSize: font * 0.5 }}>{b.name.length > 16 ? b.name.slice(0, 15) + '…' : b.name}</tspan>}
             </text>
           ))}
           {pins.map((p) => <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl pin">{p.text}</text>)}
