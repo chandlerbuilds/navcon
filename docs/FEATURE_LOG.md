@@ -74,7 +74,12 @@ This block is the only part of the file that is edited in place. Update it whene
 - **What changed:** A working rule, not a feature. Interface-only pull requests may be merged by their author once CI and Gitar finish. Routing, search, server, deploy and data changes still need another person's approval. This log and its review rule arrive in the same pull request.
 - **State:** Open
 
-### 16:00 · Search telemetry counts on-device searches; Vercel removed · branch `dash0-search-telemetry`
+### 16:16 · Map-first single page: plan card, map, directions sheet · PR #9
+- **By:** Bruce, with Claude. Reviewed by Gitar.
+- **What changed:** Interface only; routing and search behave as before. On phones the route plan sits in a card above the map and the directions in a sheet below it; on wide screens both move to a column beside the map. The navy header is gone, From and To share one box, route types are a segmented control, and the directions lead with distance and walking time. Icons are drawn instead of text characters. Every control is at least 44 px tall.
+- **State:** Open
+
+### 16:22 · Search telemetry counts on-device searches; Vercel removed · branch `dash0-search-telemetry`
 - **By:** Sean, with Claude
 - **What changed:** The `search` and `search_no_results` events now fire for every search, not only when Elasticsearch answers. They count what the attendee was shown, with `source` set to `elasticsearch` or `device`. Every Dash0 event also carries the build mode (`deployment.environment.name`) and the site's host name (`deployment.name`), so the dashboard can tell local runs from the live site.
 - **Also:** Vercel is no longer used. Removed `vercel.json` and the unused `@vercel/node` package, and changed the docs to describe the cluster deploy only. The Vercel project itself was not touched.

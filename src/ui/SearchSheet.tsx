@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { searchLocal } from '../search/local';
 import { searchRemote } from '../search/remote';
 import { track } from '../telemetry';
+import { IconBack, IconClose, IconSearch } from './icons';
 import type { Place } from '../venue/types';
 
 interface Props {
@@ -51,23 +52,27 @@ export function SearchSheet({ venueId, places, title, quick, onPick, onClose }: 
   return (
     <div className="sheet" role="dialog" aria-modal="true" aria-label={title}>
       <div className="sheet-bar">
-        <button className="icon-btn" onClick={onClose} aria-label="Back">←</button>
-        <input
-          ref={input}
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder="Booth number, company or landmark"
-          aria-label={title}
-          inputMode="search"
-          enterKeyHint="search"
-          autoComplete="off"
-          autoCorrect="off"
-          spellCheck={false}
-          onKeyDown={(e) => { if (e.key === 'Enter' && results[0]) onPick(results[0]); if (e.key === 'Escape') onClose(); }}
-        />
-        {q && <button className="icon-btn" onClick={() => { setQ(''); input.current?.focus(); }} aria-label="Clear">×</button>}
+        <button className="icon-btn" onClick={onClose} aria-label="Back"><IconBack /></button>
+        <label className="search-box">
+          <IconSearch />
+          <input
+            ref={input}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Booth number, company or landmark"
+            aria-label={title}
+            inputMode="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            onKeyDown={(e) => { if (e.key === 'Enter' && results[0]) onPick(results[0]); if (e.key === 'Escape') onClose(); }}
+          />
+          {q && <button type="button" className="clear-btn" onClick={() => { setQ(''); input.current?.focus(); }} aria-label="Clear"><IconClose size={16} /></button>}
+        </label>
       </div>
-      {limited && q.trim().length >= 2 && <p className="note">Limited search: matching names and booth numbers on this device.</p>}
+      {limited && q.trim().length >= 2 && <p className="note limited">Limited search: matching names and booth numbers on this device.</p>}
+      {!q.trim() && <p className="list-head">Popular places</p>}
       <ul className="results">
         {(q.trim() ? results : quick).map((p) => (
           <li key={p.id}>
