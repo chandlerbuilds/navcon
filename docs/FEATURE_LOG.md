@@ -97,5 +97,5 @@ This block is the only part of the file that is edited in place. Update it whene
 
 ### 16:28 · Scan a booth's QR code inside the app · PR #12
 - **By:** Bruce, with Claude
-- **What changed:** A QR button in the From field opens the camera inside the app. Scanning a booth's code fills in where you are; codes for other venues or other sites are refused, not opened. Adds `jsqr` for browsers without a built-in QR reader (iPhone Safari). The spec previously said "no in-app scanner"; `docs/SPEC.md` is updated. Builds on PR #13.
+- **What changed:** A QR button in the From field opens the camera inside the app. Scanning a booth's code fills in where you are; codes for other venues or other sites are refused, not opened. The QR button replaces the empty-state text under the map, including the "Venue staff: QR codes to print" link (`/v/<venue>/qr` still works). Adds `jsqr` for browsers without a built-in QR reader (iPhone Safari). The spec previously said "no in-app scanner"; `docs/SPEC.md` is updated. Builds on PR #13.
 - **State:** Open. Needs the owner's sign-off on the product decision as well as code approval.

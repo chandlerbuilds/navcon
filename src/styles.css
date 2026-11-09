@@ -89,7 +89,6 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .panel { position: relative; z-index: 2; margin-top: -16px; display: flex; flex-direction: column; background: var(--paper); border-radius: 18px 18px 0 0; box-shadow: var(--shadow-up); max-height: 64dvh; overflow: auto; padding: 18px 12px calc(10px + env(safe-area-inset-bottom)); }
 .plan { flex: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .directions { flex: 1 0 auto; min-height: 0; padding: 14px 4px 4px; }
-.lead { margin: 0 0 4px; font-size: 16px; font-weight: 600; line-height: 1.35; }
 .directions:empty { padding: 0; }
 .grabber { position: absolute; top: 7px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--hair); }
 .summary { margin: 0 0 12px; display: grid; gap: 2px; }
