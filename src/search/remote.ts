@@ -8,7 +8,9 @@ let downUntil = 0;
 export async function searchRemote(venue: string, q: string, signal: AbortSignal): Promise<string[] | null> {
   if (!navigator.onLine || Date.now() < downUntil) return null;
   const timeout = new AbortController();
-  const timer = setTimeout(() => timeout.abort(), 1500);
+  // Longer than the server's worst case (meaning-based try, then plain fallback), so a slow
+  // first query still returns Elasticsearch results instead of switching search off for a minute.
+  const timer = setTimeout(() => timeout.abort(), 3000);
   signal.addEventListener('abort', () => timeout.abort(), { once: true });
   try {
     const res = await fetch(`/api/search?venue=${encodeURIComponent(venue)}&q=${encodeURIComponent(q)}`, { signal: timeout.signal });
