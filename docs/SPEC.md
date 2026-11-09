@@ -53,7 +53,7 @@ Each venue belongs to one organization. Admins see and edit only their own organ
 
 | Requirement | Detail |
 | --- | --- |
-| Start input | QR link, or search by booth number, company, landmark or keyword |
+| Start input | QR link, the in-app scanner, or search by booth number, company, landmark or keyword |
 | Destination input | The same search |
 | Profiles | Standard, no stairs, wheelchair |
 | Route line | Runs down the middle of aisles. Turns only in 45 degree steps: square turns where booths stand square, 45 degree legs where booths are slanted. |
@@ -63,7 +63,8 @@ Each venue belongs to one organization. Admins see and edit only their own organ
 | More than one floor | One floor shown at a time, with a "next floor" control at each stair, escalator or elevator. Not built; the first venue is one level. |
 | More than one building | Outdoor and shuttle legs show the time between buildings. Not built. |
 | No route found | A message that names the profile and destination |
-| QR link format | `https://<app>/v/<venue>?from=<place-id>&src=qr`. A plain link opened by the phone's own camera. No in-app scanner. |
+| QR link format | `https://<app>/v/<venue>?from=<place-id>&src=qr`. A plain link, so the phone's own camera opens it. |
+| In-app scanner | A QR button in the From field opens the camera inside the app. A booth code for this venue sets the start; any other code is refused and never opened. Uses the browser's barcode detector where there is one, else jsQR. Needs camera permission; if it is refused, the app says to use the phone's camera app. |
 | QR sheet | `/v/<venue>/qr` prints one code per place plus one for the app itself |
 | Language | English only for now |
 

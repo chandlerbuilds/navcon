@@ -1,14 +1,15 @@
-import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Profile } from './routing/grid';
 import { feet, PROFILE_LABEL, Router, type RouteOutcome } from './routing/route';
 import { track } from './telemetry';
 import { MapView } from './ui/MapView';
-import { IconOffline, IconPin, IconSwap } from './ui/icons';
+import { IconOffline, IconPin, IconQr, IconSwap } from './ui/icons';
 import { SearchSheet } from './ui/SearchSheet';
 import type { Place, VenueBundle } from './venue/types';
 
 const QrSheet = lazy(() => import('./ui/QrSheet'));
 const ArrivalSheet = lazy(() => import('./ui/ArrivalSheet'));
+const ScanSheet = lazy(() => import('./ui/ScanSheet'));
 const RADAR_KEY = import.meta.env.VITE_RADAR_KEY as string | undefined;
 
 const DEFAULT_VENUE = 'kcna26';
@@ -42,6 +43,7 @@ export default function App() {
   const [notice, setNotice] = useState<string | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
   const [arriving, setArriving] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const hadRoute = useRef(false);
 
   useEffect(() => {
@@ -78,6 +80,13 @@ export default function App() {
   }, [router]);
 
   const from = router?.place(fromId), to = router?.place(toId);
+
+  // A booth's QR code read by the in-app scanner sets the start, the same as opening its link.
+  const onScan = useCallback((id: string) => {
+    setScanning(false);
+    if (router?.place(id)) { setFromId(id); setNotice(null); track('qr_scan', { place: id, source: 'in_app' }); }
+    else setNotice('That QR code points to a place that is no longer on this map. Choose where you are.');
+  }, [router]);
 
   useEffect(() => {
     if (!venue || initial.page !== 'map') return;
@@ -139,11 +148,14 @@ export default function App() {
         <div className="plan">
           <div className="fields">
             <div className="field-stack">
-              <button className="field" onClick={() => setPicking('from')}>
-                <span className="tag tag-from" aria-hidden="true">A</span>
-                <span className="f-label">From</span>
-                <span className={from ? 'f-value' : 'f-value empty'}>{from ? from.title : 'Where are you?'}</span>
-              </button>
+              <div className="field-row">
+                <button className="field" onClick={() => setPicking('from')}>
+                  <span className="tag tag-from" aria-hidden="true">A</span>
+                  <span className="f-label">From</span>
+                  <span className={from ? 'f-value' : 'f-value empty'}>{from ? from.title : 'Where are you?'}</span>
+                </button>
+                <button className="scan-btn" onClick={() => setScanning(true)} aria-label="Scan a booth’s QR code to set where you are"><IconQr /></button>
+              </div>
               <button className="field" onClick={() => setPicking('to')}>
                 <span className="tag tag-to" aria-hidden="true">B</span>
                 <span className="f-label">To</span>
@@ -171,19 +183,19 @@ export default function App() {
                 <span className="sum-meta">{Math.round(route.meters)} m · {PROFILE_LABEL[route.profile]} route</span>
               </p>
               <ol className="steps">{route.steps.map((s, i) => <li key={i}>{s.text}</li>)}</ol>
-              <p className="hint">Scan another booth's QR code on the way to update where you are.</p>
+              <p className="hint">Passing another booth? Scan its QR code to update where you are.</p>
             </>
           ) : outcome && !outcome.ok ? (
             <p className="summary alert" role="alert">{outcome.reason}</p>
-          ) : (
-            <>
-              <p className="lead">{from ? `You are at ${from.title}. Choose where to go.` : 'Scan a booth’s QR code, or tell us where you are.'}</p>
-              <p className="hint">This single-level floor has no stairs, so all three route types are step-free. Wheelchair routes keep extra clearance.</p>
-              <p className="hint"><a href={`/v/${venue.id}/qr`}>Venue staff: QR codes to print</a></p>
-            </>
-          )}
+          ) : null}
         </div>
       </section>
+
+      {scanning && (
+        <Suspense fallback={null}>
+          <ScanSheet venueId={venue.id} onScan={onScan} onClose={() => setScanning(false)} />
+        </Suspense>
+      )}
 
       {arriving && RADAR_KEY && (
         <Suspense fallback={null}>
