@@ -26,7 +26,12 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .brand { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; }
 .brand img { flex: none; border-radius: 6px; }
 .brand strong { font-size: 16px; letter-spacing: -0.01em; color: var(--brand); }
-.brand .venue { min-width: 0; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* The venue sits on its own line under the logo, as a chip, so a long name is not cut off beside it. */
+.brand { flex-wrap: wrap; row-gap: 2px; }
+.brand strong { margin-right: auto; }
+.brand .venue { order: 9; flex: 0 0 100%; min-width: 0; display: flex; padding-bottom: 4px; }
+.venue-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 4px 10px 4px 8px; border-radius: 999px; background: #efede8; color: #4a4741; font-size: 12.5px; font-weight: 550; line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.venue-chip svg { flex: none; color: var(--brand); }
 .link-btn { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 12px; border: 0; border-radius: 22px; background: var(--brand-soft); color: var(--brand); font-size: 13px; font-weight: 600; }
 .link-btn:active { background: #d6dff3; }
 
@@ -85,6 +90,24 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .map-ctl button { display: grid; place-items: center; width: 44px; height: 44px; border: 0; background: var(--paper); color: var(--ink); }
 .map-ctl button + button { border-top: 1px solid var(--hair); }
 .map-ctl button:active { background: #f1efea; }
+/* Route type: a floating round button above the zoom controls, with a menu that opens beside it. */
+.profile { position: absolute; right: 10px; bottom: 170px; }
+.profile-fab { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--paper); color: var(--ink); box-shadow: var(--shadow-1); }
+.profile-fab:active { background: #f1efea; }
+.profile-fab.is-set { background: var(--brand); color: #fff; }
+.profile-badge { position: absolute; top: -3px; right: -3px; display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--from); color: #fff; box-shadow: 0 0 0 2px var(--paper); }
+.profile-menu { position: absolute; right: 54px; bottom: 0; width: min(270px, calc(100vw - 84px)); padding: 6px; border-radius: 14px; background: var(--paper); box-shadow: 0 8px 28px rgb(28 27 25 / 0.22), 0 0 0 1px rgb(28 27 25 / 0.06); transform-origin: bottom right; animation: profile-in 0.14s ease-out; }
+@keyframes profile-in { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
+.profile-title { margin: 6px 10px 4px; font-size: 12px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+.profile-menu button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 6px 8px; border: 0; border-radius: 10px; background: none; color: var(--ink); text-align: left; }
+.profile-menu button:active, .profile-menu button.is-on { background: var(--brand-soft); }
+.profile-ico { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 50%; background: #efede8; color: var(--ink); }
+.profile-menu button.is-on .profile-ico { background: var(--brand); color: #fff; }
+.profile-text { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.profile-text strong { font-size: 15px; font-weight: 650; }
+.profile-text span { font-size: 12.5px; color: var(--muted); }
+.profile-check { flex: none; width: 18px; color: var(--brand); }
+@media (prefers-reduced-motion: reduce) { .profile-menu { animation: none; } }
 
 .panel { position: relative; z-index: 2; margin-top: -16px; display: flex; flex-direction: column; background: var(--paper); border-radius: 18px 18px 0 0; box-shadow: var(--shadow-up); max-height: 64dvh; overflow: auto; padding: 18px 12px calc(10px + env(safe-area-inset-bottom)); }
 .plan { flex: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
@@ -164,6 +187,7 @@ a { color: var(--brand); text-underline-offset: 3px; }
   .panel.is-collapsed .directions { display: block; }
   .map { grid-column: 2; grid-row: 1 / -1; margin: 0; border-left: 1px solid var(--line); }
   .map-ctl { bottom: 16px; right: 16px; }
+  .profile { bottom: 160px; right: 16px; }
   .sheet { right: auto; width: 380px; box-shadow: 6px 0 24px rgb(28 27 25 / 0.12); }
 }
 @media (hover: hover) {

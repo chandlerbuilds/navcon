@@ -3,6 +3,7 @@ import type { Profile } from './routing/grid';
 import { feet, PROFILE_LABEL, Router, type RouteOutcome } from './routing/route';
 import { track } from './telemetry';
 import { MapView } from './ui/MapView';
+import { ProfileMenu } from './ui/ProfileMenu';
 import { IconOffline, IconPin, IconQr, IconSwap } from './ui/icons';
 import { SearchSheet } from './ui/SearchSheet';
 import type { Place, VenueBundle } from './venue/types';
@@ -140,11 +141,13 @@ export default function App() {
       <header className="top brand">
         <img src="/icon.svg" alt="" width={22} height={22} />
         <strong>Navcon</strong>
-        <span className="venue">{venue.name}</span>
+        <span className="venue"><span className="venue-chip" title={venue.name}><IconPin size={13} />{venue.name}</span></span>
         {RADAR_KEY && venue.geo && <button className="link-btn" onClick={() => setArriving(true)}><IconPin size={16} />Getting here</button>}
       </header>
 
-      <MapView venue={venue} route={route} from={from} to={to} />
+      <MapView venue={venue} route={route} from={from} to={to}>
+        <ProfileMenu profile={profile} onChange={setProfile} />
+      </MapView>
 
       <section className={collapsed && route ? 'panel is-collapsed' : 'panel'} aria-label="Plan a route">
         {route && (
@@ -188,12 +191,6 @@ export default function App() {
               </button>
             </div>
             <button className="swap" onClick={() => { setFromId(toId); setToId(fromId); }} disabled={!from && !to} aria-label="Swap start and destination"><IconSwap /></button>
-          </div>
-
-          <div className="seg" role="group" aria-label="Route type">
-            {PROFILES.map((p) => (
-              <button key={p} aria-pressed={profile === p} onClick={() => setProfile(p)}>{PROFILE_LABEL[p]}</button>
-            ))}
           </div>
 
           {!online && <p className="banner"><IconOffline />You are offline. Routes still work; search matches names and booth numbers only.</p>}
