@@ -45,7 +45,7 @@ Every push to `main` deploys to production. The image `newName` and `newTag` in 
 
 ## Pull requests
 
-One change per pull request, with a description that says what was checked. A change to the interface should say it was checked in a phone-sized browser, because that is how judges and attendees open the app.
+One change per pull request, with a description that says what was checked. Interface-only changes (`src/ui/`, `src/styles.css`, `index.html`, icons) may be merged by their author once CI passes. Any other change needs another person's approval: flag a pull request that mixes interface changes with routing, search, server, deploy or data changes, because the mix would let those skip approval. A change to the interface should say it was checked in a phone-sized browser, because that is how judges and attendees open the app.
 
 ## Feature log
 

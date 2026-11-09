@@ -23,7 +23,10 @@ CI (`.github/workflows/ci.yml`) runs typecheck, test and build on every push and
 
 ## How we work
 
-- Change `main` through pull requests. A human merges; do not merge your own pull request without review.
+- Change `main` through pull requests, and wait for CI and Gitar to finish before merging. A human merges.
+- Interface-only changes may be merged by their author without a second approval: files under `src/ui/`, `src/styles.css`, `index.html` and icons in `public/`. Check the pull request's preview link on a phone first.
+- Everything else needs another person's approval before it merges: routing (`src/routing/`), search and the API (`api/`, `src/search/`), `server.mjs`, deploy files, CI workflows, venue data and `tools/`. In `src/App.tsx`, layout-only edits count as interface changes; anything that changes behaviour needs approval.
+- A pull request that changes what the app does, or how it is built or deployed, adds an entry at the end of `docs/FEATURE_LOG.md`.
 - Keep it simple. The owner's rule: more features means more noise. Do not add interactions the spec lists as non-goals (for example an "I'm here" tap, or picking places by tapping the map).
 - The app is public and judges will open it on their phones. Check a change in a phone-sized browser before proposing it.
 - Never commit keys. Browser keys are `VITE_*` build-time variables; server keys live in Vercel environment settings.

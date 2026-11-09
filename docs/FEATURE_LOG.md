@@ -21,11 +21,10 @@ The product spec is `docs/SPEC.md`. The spec says what Navcon should be; this lo
 
 ## Current status
 
-This block is the only part of the file that is edited in place. Update it whenever something merges or goes live, and change the time. Last updated 15:35.
+This block is the only part of the file that is edited in place. Update it whenever something merges or goes live, and change the time. Last updated 15:42.
 
 **Open pull requests**
 
-- **PR #3 · Arc bows upward, no vendor names during a route, `CLAUDE.md` and `docs/SPEC.md`.** Approved by Sean. Not merged.
 - **PR #6 · Gitar demo.** Lowers one routing cost on purpose, which fails the check "diagonal leg in a square hall". Gitar diagnosed it and asked for the routing code to be put back. Do not merge while CI is red.
 
 **Not live yet**
@@ -64,3 +63,13 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Chandler, with Claude. Reviewed by Sean and Gitar.
 - **What changed:** `.gitar/review/` now holds the routing rules and team conventions that Gitar reviews every pull request against. The README describes the right Radar, and discloses AI assistant use as the hackathon rules require.
 - **State:** Merged
+
+### 15:36 · Arc bows upward; no vendor names during a route; handoff docs · PR #3
+- **By:** Chandler, with Claude. Reviewed by Sean and Gitar.
+- **What changed:** The dotted arc into a place always bows toward the top of the screen. While a route is shown, vendor names are removed from the map and booth numbers stay. `CLAUDE.md` and `docs/SPEC.md` are now in the repository.
+- **State:** Live on the cluster (build 8096295).
+
+### 15:42 · Interface changes no longer need a second approval · PR #7
+- **By:** Chandler, with Claude
+- **What changed:** A working rule, not a feature. Interface-only pull requests may be merged by their author once CI and Gitar finish. Routing, search, server, deploy and data changes still need another person's approval. This log and its review rule arrive in the same pull request.
+- **State:** Open
