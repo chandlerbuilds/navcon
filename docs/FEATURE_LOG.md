@@ -90,7 +90,7 @@ This block is the only part of the file that is edited in place. Update it whene
 - **What changed:** Panning or zooming the map on an iPhone left trails of old outline strokes behind. Map lines now get their on-screen width from the zoom level instead of `vector-effect: non-scaling-stroke`, which is what WebKit was failing to repaint. Lines look the same as before.
 - **State:** Merged. Confirmed on a real iPhone in Safari and Chrome using the pull request's preview build.
 
-### 16:42 · Plan moves to the bottom sheet on phones · PR (this one)
+### 16:36 · Plan moves to the bottom sheet on phones · PR #13
 - **By:** Bruce, with Claude
 - **What changed:** Interface only. On phones, From, To, swap and route type sit in the bottom sheet above the directions, within reach of a thumb; the top keeps a slim brand bar. The empty-state text under the map is removed, including the "Venue staff: QR codes to print" link (`/v/<venue>/qr` still works). Split out of the in-app scanner pull request, which needs its own approval.
 - **State:** Open
