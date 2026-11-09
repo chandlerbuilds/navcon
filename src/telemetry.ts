@@ -9,7 +9,14 @@ let enabled = false;
 export function initTelemetry(): void {
   if (!url || !token) return;
   try {
-    init({ serviceName: 'navcon-pwa', endpoint: { url, authToken: token } });
+    init({
+      serviceName: 'navcon-pwa',
+      // Lets the dashboard separate local runs from real use, and the Vercel site
+      // (and its previews) from the cluster copy.
+      environment: import.meta.env.MODE,
+      deploymentName: location.hostname,
+      endpoint: { url, authToken: token },
+    });
     enabled = true;
   } catch (err) {
     console.warn('telemetry disabled', err);
