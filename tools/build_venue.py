@@ -2,7 +2,10 @@
 """Turn a vector floor-plan PDF into a Navcon venue bundle.
 
 Usage:
-  python3 tools/build_venue.py <map.pdf> <page1.png> data/kcna26/exhibitors.tsv public/venues/kcna26.json
+  python3 tools/build_venue.py <map.pdf> <page1.png> data/kcna26/exhibitors.tsv public/venues/kcna26.json [data/kcna26/keywords.tsv]
+
+The optional keywords file (booth number, tab, comma-separated search keywords) lets people
+search by what a company does. Keywords are editorial: a venue admin maintains them.
 
 <page1.png> is the map page rendered with `pdftoppm -r 200 -f 1 -l 1 -png`; it is only
 used to sample display colours. The PDF itself is not committed to the repository.
@@ -158,7 +161,14 @@ def pip(x, y, poly):
     return inside
 
 
-def main(pdf_path, png_path, exhibitors_path, out_path):
+def main(pdf_path, png_path, exhibitors_path, out_path, keywords_path=None):
+    tags = {}
+    if keywords_path:
+        with open(keywords_path, encoding="utf-8") as f:
+            for line in f:
+                if "\t" in line:
+                    num, words = line.rstrip("\n").split("\t", 1)
+                    tags[num.strip()] = words.strip()
     names = {}
     with open(exhibitors_path, encoding="utf-8") as f:
         for line in f:
@@ -258,7 +268,10 @@ def main(pdf_path, png_path, exhibitors_path, out_path):
                 cy = sum(q[1] for q in p) / len(p)
                 # sample just inside a corner, away from the printed number
                 tiers[s["tier"]] = sample(p[0][0] + (cx - p[0][0]) * 0.18, p[0][1] + (cy - p[0][1]) * 0.18)
-            booths.append({"id": f"b{num}", "number": num, "name": names.get(num), "tier": s["tier"], "poly": to_m(s["poly"])})
+            booth = {"id": f"b{num}", "number": num, "name": names.get(num), "tier": s["tier"], "poly": to_m(s["poly"])}
+            if num in tags:
+                booth["tags"] = tags[num]
+            booths.append(booth)
         booths.sort(key=lambda b: b["number"])
         tiers["feature"] = "#ffffff"
 
@@ -309,4 +322,4 @@ def main(pdf_path, png_path, exhibitors_path, out_path):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:5])
+    main(*sys.argv[1:6])

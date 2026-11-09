@@ -105,6 +105,13 @@ describe('offline search', () => {
     expect(find('datadgo')[0]).toBe('b152');
     expect(find('clickhuose')[0]).toBe('b108');
   });
+  it('finds exhibitors by what they do', () => {
+    const ids = find('observability');
+    expect(ids).toContain('b134');
+    expect(ids).toContain('b152');
+    expect(find('geofencing')[0]).toBe('b365');
+    expect(find('postgres').length).toBeGreaterThan(3);
+  });
   it('finds landmarks and synonyms', () => {
     expect(find('main entrance')[0]).toBe('main-entrance');
     expect(find('bathroom').length).toBeGreaterThan(0);

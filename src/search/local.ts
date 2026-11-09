@@ -31,7 +31,7 @@ function editDistance(a: string, b: string, max: number): number {
   return prev[b.length];
 }
 
-interface Indexed { place: Place; title: string; words: string[]; squashed: string; extra: string }
+interface Indexed { place: Place; title: string; words: string[]; squashed: string; extra: string; tags: string[] }
 const cache = new WeakMap<Place[], Indexed[]>();
 
 function index(places: Place[]): Indexed[] {
@@ -39,7 +39,7 @@ function index(places: Place[]): Indexed[] {
   if (!idx) {
     idx = places.map((place) => {
       const title = norm(place.title);
-      return { place, title, words: title.split(' '), squashed: title.replace(/ /g, ''), extra: norm(place.subtitle) };
+      return { place, title, words: title.split(' '), squashed: title.replace(/ /g, ''), extra: norm(place.subtitle), tags: norm(place.tags ?? '').split(' ').filter(Boolean) };
     });
     cache.set(places, idx);
   }
@@ -58,6 +58,8 @@ function score(e: Indexed, q: string, qWords: string[], qSquashed: string): numb
   if (qWords.every((w) => e.words.some((t) => t.startsWith(w)))) return 600 - e.title.length * 0.1;
   if (e.title.includes(q) || e.squashed.includes(qSquashed)) return 400;
   if (qWords.every((w) => e.words.some((t) => t.startsWith(w)) || e.extra.split(' ').some((t) => t.startsWith(w)))) return 350;
+  // what the exhibitor does: "observability", "postgres", "api gateway"
+  if (e.tags.length && qWords.every((w) => w.length >= 3 && e.tags.some((t) => t.startsWith(w)))) return 250;
   if (qSquashed.length >= 4) {
     const max = qSquashed.length >= 7 ? 2 : 1;
     let best = max + 1;
@@ -82,5 +84,7 @@ export function searchLocal(places: Place[], query: string, limit = 8): Place[] 
     if (s > 0) hits.push({ place: e.place, s: s + (e.place.kind === 'booth' ? 1 : 0) });
   }
   hits.sort((a, b) => b.s - a.s || a.place.title.localeCompare(b.place.title));
-  return hits.slice(0, limit).map((h) => h.place);
+  // keyword matches ("observability") can be many: show more of them than name matches
+  const cap = hits.length && hits[0].s <= 251 ? Math.max(limit, 24) : limit;
+  return hits.slice(0, cap).map((h) => h.place);
 }
