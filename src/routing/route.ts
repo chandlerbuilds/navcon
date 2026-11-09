@@ -1,7 +1,7 @@
 import { placesOf, type Place, type Pt, type VenueBundle } from '../venue/types';
-import { findPath, simplify } from './astar';
+import { corners, findPath } from './astar';
 import { dist, distPointPoly } from './geometry';
-import { buildGrid, cellCenter, MARGIN, nearestFree, type Grid, type Profile } from './grid';
+import { accessCell, accessCells, buildGrid, cellCenter, MARGIN, type Grid, type Profile } from './grid';
 
 export const WALK_SPEED = 1.2; // metres per second
 
@@ -54,9 +54,18 @@ export class Router {
     return g;
   }
 
-  /** The walkable cell a person stands on when they are "at" a place, or -1. */
-  access(place: Place, profile: Profile): number {
-    return nearestFree(this.grid(profile), place.center, 40);
+  /**
+   * The walkable cells that count as being "at" a place. A booth or open area gives
+   * the band of floor around it, so a route can use whichever side suits the trip.
+   */
+  access(place: Place, profile: Profile): number[] {
+    const g = this.grid(profile);
+    if (place.poly) {
+      const cells = accessCells(g, place.poly);
+      if (cells.length) return cells;
+    }
+    const c = accessCell(g, place.center, 40);
+    return c < 0 ? [] : [c];
   }
 
   route(fromId: string, toId: string, profile: Profile): RouteOutcome {
@@ -65,11 +74,11 @@ export class Router {
     const g = this.grid(profile);
     const a = this.access(from, profile), b = this.access(to, profile);
     const who = profile === 'standard' ? 'route' : `${PROFILE_LABEL[profile].toLowerCase()} route`;
-    if (a < 0) return { ok: false, reason: `No ${who} from ${label(from)}.` };
-    if (b < 0) return { ok: false, reason: `No ${who} to ${label(to)}.` };
+    if (!a.length) return { ok: false, reason: `No ${who} from ${label(from)}.` };
+    if (!b.length) return { ok: false, reason: `No ${who} to ${label(to)}.` };
     const cells = findPath(g, a, b);
     if (!cells) return { ok: false, reason: `No ${who} to ${label(to)}.` };
-    const path = simplify(g, cells).map((c) => cellCenter(g, c));
+    const path = corners(g, cells).map((c) => cellCenter(g, c));
     let meters = 0;
     for (let i = 1; i < path.length; i++) meters += dist(path[i - 1], path[i]);
     const marks: string[] = [];
