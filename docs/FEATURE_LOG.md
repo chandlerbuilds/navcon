@@ -29,8 +29,8 @@ This block is the only part of the file that is edited in place. Update it whene
 
 **Not live yet**
 
-- **Elasticsearch search.** The cluster has credentials but its search requests fail, most likely because the venue has not been indexed (`npm run index:places`). The app falls back to on-device search. Vercel has no credentials.
-- **Dash0 telemetry.** Neither live build has a Dash0 endpoint. Waiting on `VITE_DASH0_ENDPOINT` and `VITE_DASH0_TOKEN` as GitHub repository variables, then a rebuild.
+- **Elasticsearch search.** The cluster has credentials but its search requests fail, most likely because the venue has not been indexed (`npm run index:places`). The app falls back to on-device search.
+- **Dash0 telemetry.** The live build has no Dash0 endpoint. Waiting on `VITE_DASH0_ENDPOINT` and `VITE_DASH0_TOKEN` as GitHub repository variables, then a rebuild.
 
 ## 2026-11-09 (hackathon day)
 
@@ -74,7 +74,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **What changed:** A working rule, not a feature. Interface-only pull requests may be merged by their author once CI and Gitar finish. Routing, search, server, deploy and data changes still need another person's approval. This log and its review rule arrive in the same pull request.
 - **State:** Open
 
-### 16:00 · Search telemetry counts on-device searches · branch `dash0-search-telemetry`
+### 16:00 · Search telemetry counts on-device searches; Vercel removed · branch `dash0-search-telemetry`
 - **By:** Sean, with Claude
-- **What changed:** The `search` and `search_no_results` events now fire for every search, not only when Elasticsearch answers. They count what the attendee was shown, with `source` set to `elasticsearch` or `device`. Every Dash0 event also carries the build mode (`deployment.environment.name`) and the site's host name (`deployment.name`), so the dashboard can tell local runs, Vercel previews, the Vercel site and the cluster apart.
-- **State:** Open. Needs a second approval (search). Sends nothing until the Dash0 keys are set.
+- **What changed:** The `search` and `search_no_results` events now fire for every search, not only when Elasticsearch answers. They count what the attendee was shown, with `source` set to `elasticsearch` or `device`. Every Dash0 event also carries the build mode (`deployment.environment.name`) and the site's host name (`deployment.name`), so the dashboard can tell local runs from the live site.
+- **Also:** Vercel is no longer used. Removed `vercel.json` and the unused `@vercel/node` package, and changed the docs to describe the cluster deploy only. The Vercel project itself was not touched.
+- **State:** Open. Needs a second approval (search, deploy files). Sends nothing until the Dash0 keys are set.

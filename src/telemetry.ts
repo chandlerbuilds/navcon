@@ -11,8 +11,7 @@ export function initTelemetry(): void {
   try {
     init({
       serviceName: 'navcon-pwa',
-      // Lets the dashboard separate local runs from real use, and the Vercel site
-      // (and its previews) from the cluster copy.
+      // Lets the dashboard separate local runs from the live site.
       environment: import.meta.env.MODE,
       deploymentName: location.hostname,
       endpoint: { url, authToken: token },

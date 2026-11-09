@@ -126,7 +126,7 @@ Attendee phones read one published file per venue and compute routes locally. On
 | --- | --- | --- |
 | Attendee PWA | Phone browser | Floor plan drawn by the app itself (SVG), search box, routing, offline cache |
 | Venue bundle | Static file, `public/venues/<id>.json` | One file per venue: outline, zones, booths, areas, points, doors, keywords |
-| API functions | Vercel serverless, `api/` | Search proxy to Elasticsearch |
+| API functions | `server.mjs` in the container, `api/` | Search proxy to Elasticsearch |
 | Admin portal | Browser, signed in | Venue editor, checks, publish. Not built. |
 | Admin database | Postgres with sign-in (Supabase proposed) | Organizations, admins, venues, drafts, versions. Not built. |
 | Elasticsearch | Elastic Cloud | Place search |
@@ -134,7 +134,7 @@ Attendee phones read one published file per venue and compute routes locally. On
 | Dash0 | Dash0 | Sessions, traces, custom events, dashboards |
 | Gitar | GitHub repository | Pull request review and CI fixes |
 
-Hosting is Vercel. The PWA and API functions deploy from the GitHub repository on every push to `main`.
+Hosting is the team namespace on the `lunzerr` Kubernetes cluster in Radar Cloud. Every push to `main` builds a container image with the PWA and the search function, and Argo CD rolls it out.
 
 Shapes are stored in metres, origin top left, y pointing down. The first venue's scale is derived from booth sizes, assuming a platinum booth is 20 ft square.
 
@@ -144,7 +144,7 @@ Shapes are stored in metres, origin top left, y pointing down. The first venue's
 | --- | --- | --- |
 | Elasticsearch | Place search: typo-tolerant match on booth number, company and landmark, plus meaning-based match on what a company does | Type a misspelled vendor name, then "tools for tracing", and get the right booths |
 | Radar | A "Getting here" screen: the venue on a map, address lookup, a geofence that tells you whether you are on site, and walking time to the venue | Tap Getting here: the venue on a Radar map, an on-site check and the walking time from where you stand |
-| Dash0 | Real-user monitoring in the PWA, logs from the API through the Vercel log drain, custom navigation events | A dashboard of most-requested booths, searches with no results and search speed |
+| Dash0 | Real-user monitoring in the PWA, including the timing of each search request, and custom navigation events | A dashboard of most-requested booths, searches with no results and search speed |
 | Gitar | Reviews every pull request and repairs failing CI | A pull request where a routing check failed and Gitar fixed it |
 
 Elasticsearch
@@ -162,8 +162,7 @@ Radar
 
 Dash0
 - The Web SDK in the PWA records sessions, errors and page speed.
-- Dash0's Vercel integration sets up a log drain, so build and function logs arrive in Dash0.
-- `api/search.ts` logs one structured line per search with the browser's `traceparent`.
+- `api/search.ts` logs one structured line per search with the browser's `traceparent`. These logs stay in the cluster; nothing forwards them to Dash0 yet.
 - Custom events: `qr_scan`, `search`, `search_no_results`, `route_requested`, `route_failed`, `route_updated`.
 - Still to make: one dashboard for organizers and one alert on search or route failures.
 
@@ -217,7 +216,7 @@ Demo script
 ## Open questions
 
 - Scale is assumed from booth sizes, taking a platinum booth as 20 ft square. One real measurement would confirm it.
-- Confirm Supabase for the admin database and sign-in, and check that the team's Vercel plan includes log drains.
+- Confirm Supabase for the admin database and sign-in.
 - Who creates the Elastic, Radar, Dash0 and Gitar accounts and keys?
 - Where can QR codes be posted at the venue for the demo?
 - Do any places at this venue have real doors that should be marked?

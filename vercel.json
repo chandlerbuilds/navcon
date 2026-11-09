@@ -1,3 +1,0 @@
-{
-  "rewrites": [{ "source": "/((?!api/|assets/|venues/|.*\\.[a-z0-9]+$).*)", "destination": "/index.html" }]
-}

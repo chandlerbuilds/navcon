@@ -3,9 +3,8 @@
 Walking directions inside conference venues. A PWA with on-device routing; no install, no sign-in. Built at a hackathon on 2026-11-09 with a demo deadline of 5:30pm MST that day.
 
 - Product spec: `docs/SPEC.md` (read it before changing behavior)
-- Live app: https://navcon.vercel.app (production = `main`, every push deploys)
+- Live app: https://lunzerr.cnh.radarhq.io (production = `main`; every push builds an image and Argo CD rolls it out to the `lunzerr` cluster)
 - Repository: https://github.com/chandlerbuilds/navcon (public)
-- Vercel: project `navcon` (`prj_HqWolTTaw6pwesIFjRriRCWxUzhZ`) in team `chandlerbuilds` (`team_d0RObxV1ynKhePirFSNyoViF`)
 - Team: Chandler (owner, `chandlerbuilds`), Sean and Bruce (collaborators)
 
 ## Commands
@@ -19,17 +18,17 @@ npm run build        # type-check, then build to dist/
 npm run index:places # index a venue into Elasticsearch (needs keys)
 ```
 
-CI (`.github/workflows/ci.yml`) runs typecheck, test and build on every push and pull request.
+CI (`.github/workflows/ci.yml`) runs typecheck, test and build on every push and pull request. `.github/workflows/deploy.yaml` builds the container on every push to `main`.
 
 ## How we work
 
 - Change `main` through pull requests, and wait for CI and Gitar to finish before merging. A human merges.
-- Interface-only changes may be merged by their author without a second approval: files under `src/ui/`, `src/styles.css`, `index.html` and icons in `public/`. Check the pull request's preview link on a phone first.
+- Interface-only changes may be merged by their author without a second approval: files under `src/ui/`, `src/styles.css`, `index.html` and icons in `public/`. There are no preview links: check the branch with `npm run dev` in a phone-sized browser first.
 - Everything else needs another person's approval before it merges: routing (`src/routing/`), search and the API (`api/`, `src/search/`), `server.mjs`, deploy files, CI workflows, venue data and `tools/`. In `src/App.tsx`, layout-only edits count as interface changes; anything that changes behaviour needs approval.
 - A pull request that changes what the app does, or how it is built or deployed, adds an entry at the end of `docs/FEATURE_LOG.md`.
 - Keep it simple. The owner's rule: more features means more noise. Do not add interactions the spec lists as non-goals (for example an "I'm here" tap, or picking places by tapping the map).
 - The app is public and judges will open it on their phones. Check a change in a phone-sized browser before proposing it.
-- Never commit keys. Browser keys are `VITE_*` build-time variables; server keys live in Vercel environment settings.
+- Never commit keys. Browser keys are `VITE_*` build-time variables; set them as GitHub repository variables, which `deploy.yaml` passes to the image build. Server keys live in the Kubernetes Secret `app-credentials` (see `deploy/deployment.yaml`).
 - The organizers' floor-plan PDF is not in this public repository. Only data derived from it is.
 
 ## Layout
@@ -47,7 +46,7 @@ CI (`.github/workflows/ci.yml`) runs typecheck, test and build on every push and
 | `src/ui/MapView.tsx` | SVG floor plan with pan and zoom, route line, dotted arc, labels |
 | `src/ui/SearchSheet.tsx`, `QrSheet.tsx`, `ArrivalSheet.tsx` | Search, printable QR codes, Radar "Getting here" |
 | `src/telemetry.ts`, `src/radar.ts` | Dash0 events; lazy Radar loader |
-| `api/search.ts` | Vercel function: Elasticsearch search proxy with rate limit |
+| `api/search.ts` | Elasticsearch search proxy with rate limit; `server.mjs` serves it as `/api/search` |
 | `tools/index_places.mjs`, `tools/radar_geofence.mjs` | Index a venue; create the venue geofence |
 | `tests/routing.test.ts` | The routing and search checks |
 
@@ -79,12 +78,12 @@ Live and checked in a phone-sized Chrome (including offline reload): venue data,
 
 Open pull request: number 3, "Concave-down dotted arc; no vendor names during a route". If it is still open, it also carries this file and `docs/SPEC.md`.
 
-Built but never run against the real service (waiting for keys in Vercel, then a redeploy):
+Built but never run against the real service (waiting for keys, then a rebuild):
 
 | Tool | Keys | Then |
 | --- | --- | --- |
 | Elasticsearch | `ELASTICSEARCH_URL`, `ELASTICSEARCH_API_KEY` | `npm run index:places`, then check `/api/search?venue=kcna26&q=dash0` |
-| Dash0 | `VITE_DASH0_ENDPOINT`, `VITE_DASH0_TOKEN`; install the Dash0 integration on Vercel | Confirm events arrive; build the dashboard and one alert |
+| Dash0 | `VITE_DASH0_ENDPOINT`, `VITE_DASH0_TOKEN` as GitHub repository variables | Confirm events arrive; build the dashboard and one alert |
 | Radar | `VITE_RADAR_KEY`; `RADAR_SECRET_KEY=... node tools/radar_geofence.mjs kcna26` | Open "Getting here" on a phone |
 | Gitar | Installed: a Gitar check ran on pull request 3 | Open a pull request with a failing routing check for the demo |
 

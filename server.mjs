@@ -1,6 +1,6 @@
 // Production server for the container image (Radar / Kubernetes deploy).
 // Serves the built PWA from dist/, runs api/search.ts as /api/search, and
-// answers the /healthz and /readyz probes. Vercel does not use this file.
+// answers the /healthz and /readyz probes.
 import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
@@ -29,7 +29,7 @@ const TYPES = {
   '.woff2': 'font/woff2',
 };
 
-// Same rule as the rewrite in vercel.json: app routes fall back to index.html,
+// App routes fall back to index.html;
 // anything that looks like a file or lives under api/, assets/ or venues/ does not.
 const isAppRoute = (path) => !/^\/(api|assets|venues)\//.test(path) && !/\.[a-z0-9]+$/i.test(path);
 
@@ -63,11 +63,11 @@ async function sendFile(res, rel, method) {
   return true;
 }
 
-// The small slice of the Vercel request/response API that api/search.ts uses.
-function runVercelHandler(handler, req, res, url) {
+// The small request/response API that api/search.ts expects.
+function runHandler(handler, req, res, url) {
   req.query = Object.fromEntries(url.searchParams);
-  // api/search.ts rate-limits on the first X-Forwarded-For entry. Vercel overwrites
-  // that header; the cluster gateway appends to it, so earlier entries are whatever
+  // api/search.ts rate-limits on the first X-Forwarded-For entry. The cluster
+  // gateway appends to that header, so earlier entries are whatever
   // the client sent. Keep only the hop the gateway added (or the socket peer).
   const xff = String(req.headers['x-forwarded-for'] ?? '')
     .split(',')
@@ -100,7 +100,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ ok: true, version: VERSION }));
     }
-    if (path === '/api/search') return await runVercelHandler(search, req, res, url);
+    if (path === '/api/search') return await runHandler(search, req, res, url);
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       res.writeHead(405, { Allow: 'GET, HEAD' });
       return res.end();
