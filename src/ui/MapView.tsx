@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { pointInPoly } from '../routing/geometry';
 import type { Route } from '../routing/route';
 import { centroid, type Place, type Pt, type VenueBundle } from '../venue/types';
 
@@ -142,13 +141,13 @@ export function MapView({ venue, route, from, to }: Props) {
   const spur = (p: Pt, place: Place) => {
     let t = place.center;
     if (place.doors?.length) t = place.doors.reduce((a, b) => (Math.hypot(a[0] - p[0], a[1] - p[1]) <= Math.hypot(b[0] - p[0], b[1] - p[1]) ? a : b));
-    // a gentle arc of round dots, the way map apps show the last few steps off the path
+    // An arc of round dots, the way map apps show the last few steps off the path.
+    // It always bows toward the top of the screen (concave down), whichever way the route arrives.
     const dx = t[0] - p[0], dy = t[1] - p[1];
-    const bend = (side: number): Pt => [(p[0] + t[0]) / 2 - dy * 0.18 * side, (p[1] + t[1]) / 2 + dx * 0.18 * side];
-    // bow toward the inside of the place, so the dots never stray over a wall or a neighbour
-    let c = bend(1);
-    if (place.poly && !pointInPoly(c[0], c[1], place.poly) && pointInPoly(bend(-1)[0], bend(-1)[1], place.poly)) c = bend(-1);
-    return <path className="spur" d={`M${p[0]} ${p[1]} Q${c[0]} ${c[1]} ${t[0]} ${t[1]}`} />;
+    let nx = -dy, ny = dx; // one of the two perpendiculars to the chord
+    if (ny > 0 || (ny === 0 && nx > 0)) { nx = -nx; ny = -ny; } // take the one that points up; for a vertical chord, left
+    const cx = (p[0] + t[0]) / 2 + nx * 0.24, cy = (p[1] + t[1]) / 2 + ny * 0.24;
+    return <path className="spur" d={`M${p[0]} ${p[1]} Q${cx} ${cy} ${t[0]} ${t[1]}`} />;
   };
   const doors = useMemo(() => [...venue.booths, ...venue.areas].flatMap((x) => (x.doors ?? []).map((d, i) => ({ key: `${x.id}-${i}`, d }))), [venue]);
 
@@ -172,7 +171,8 @@ export function MapView({ venue, route, from, to }: Props) {
           {venue.points.filter((p) => p.kind === 'hall').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl hall">{p.name.toUpperCase()}</text>
           ))}
-          {detail >= 1 && areas.map(({ a, c, tall, w }) => (
+          {/* during a route, sponsor-named areas that are not part of it lose their name too; plain facilities keep theirs */}
+          {detail >= 1 && areas.filter(({ a }) => !(route && lit && !lit.has(a.id) && (a.kind === 'lounge' || (a.kind === 'food' && !a.name.startsWith('Meal'))))).map(({ a, c, tall, w }) => (
             <text key={a.id} x={c[0]} y={c[1]} className={`lbl area-name${lit && !lit.has(a.id) ? ' dim' : ''}`}
               transform={tall ? `rotate(-90 ${c[0]} ${c[1]})` : undefined} style={{ fontSize: Math.max(1.1, Math.min(2.4, w / (a.name.length * 0.62))) }}>
               {a.name.replace(/ \(.*\)$/, '')}
@@ -181,10 +181,11 @@ export function MapView({ venue, route, from, to }: Props) {
           {detail >= 1 && venue.points.filter((p) => p.kind === 'restroom' || p.kind === 'entrance').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{p.kind === 'restroom' ? 'WC' : '▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
           ))}
+          {/* booth numbers stay during a route; vendor names are removed so only the route's own labels remain */}
           {detail >= 2 && booths.map(({ b, c, font, big }) => (
             <text key={b.id} x={c[0]} y={c[1]} className={`lbl num${lit && !lit.has(b.id) ? ' dim' : ''}`} style={{ fontSize: font }}>
               {b.number}
-              {big && b.name && <tspan x={c[0]} dy={font * 0.95} style={{ fontSize: font * 0.5 }}>{b.name.length > 16 ? b.name.slice(0, 15) + '…' : b.name}</tspan>}
+              {big && b.name && !route && <tspan x={c[0]} dy={font * 0.95} style={{ fontSize: font * 0.5 }}>{b.name.length > 16 ? b.name.slice(0, 15) + '…' : b.name}</tspan>}
             </text>
           ))}
           {pins.map((p) => <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl pin">{p.text}</text>)}
