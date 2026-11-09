@@ -36,10 +36,11 @@ Rebuild the venue bundle from a map PDF (the PDF itself is not committed):
 
 ```sh
 pdftoppm -r 200 -f 1 -l 1 -png map.pdf page
-python3 tools/build_venue.py map.pdf page-1.png data/kcna26/exhibitors.tsv public/venues/kcna26.json
+python3 tools/build_venue.py map.pdf page-1.png data/kcna26/exhibitors.tsv public/venues/kcna26.json data/kcna26/keywords.tsv
 ```
 
 ## Assumptions
 
+- `data/kcna26/keywords.tsv` holds short search keywords for exhibitors (what they do). They were written by hand from general knowledge and should be reviewed; exhibitors without a line are found by name and booth number only.
 - Scale is derived from booth sizes on the map, assuming a platinum booth is 20 ft square. Distances are approximate until someone measures one.
 - The expo floor is one level, so all three route types are step-free here.

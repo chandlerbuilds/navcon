@@ -1,6 +1,6 @@
 export type Pt = [number, number];
 
-export interface Booth { id: string; number: string; name: string | null; tier: string; poly: Pt[] }
+export interface Booth { id: string; number: string; name: string | null; tier: string; poly: Pt[]; /** search keywords: what the exhibitor does */ tags?: string }
 export interface Area { id: string; name: string; kind: string; poly: Pt[] }
 export interface PointPlace { id: string; name: string; kind: string; at: Pt }
 export interface Zone { id: string; name: string; color: string; poly: Pt[] }
@@ -31,6 +31,8 @@ export interface Place {
   number?: string;
   center: Pt;
   poly?: Pt[];
+  /** extra words this place should be found by */
+  tags?: string;
 }
 
 const TIER_LABEL: Record<string, string> = {
@@ -55,7 +57,7 @@ export function placesOf(v: VenueBundle): Place[] {
       id: b.id, kind: 'booth', number: b.number,
       title: b.name ?? `Booth ${b.number}`,
       subtitle: `Booth ${b.number} · ${TIER_LABEL[b.tier] ?? b.tier}`,
-      center: centroid(b.poly), poly: b.poly,
+      center: centroid(b.poly), poly: b.poly, tags: b.tags,
     });
   }
   for (const a of v.areas) {

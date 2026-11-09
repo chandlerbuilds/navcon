@@ -51,7 +51,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const q = String(req.query.q ?? '').trim().slice(0, 80);
   const venue = String(req.query.venue ?? '').trim().slice(0, 40);
   if (!q || !venue) return res.status(400).json({ error: 'q and venue are required' });
-  if (!ES_URL || !ES_KEY) return res.status(503).json({ error: 'search service is not configured' });
+  // Not configured is a normal state (the app then searches on the device), so it is not an error.
+  if (!ES_URL || !ES_KEY) return res.status(200).json({ configured: false });
   const ip = String(req.headers['x-forwarded-for'] ?? 'unknown').split(',')[0].trim();
   if (limited(ip)) return res.status(429).json({ error: 'too many requests' });
 

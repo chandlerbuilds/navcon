@@ -16,7 +16,8 @@ export async function searchRemote(venue: string, q: string, signal: AbortSignal
       if (res.status !== 429) downUntil = Date.now() + 60_000;
       return null;
     }
-    const body = (await res.json()) as { ids?: string[] };
+    const body = (await res.json()) as { ids?: string[]; configured?: boolean };
+    if (body.configured === false) downUntil = Date.now() + 5 * 60_000;
     return Array.isArray(body.ids) ? body.ids : null;
   } catch {
     if (!signal.aborted) downUntil = Date.now() + 15_000;

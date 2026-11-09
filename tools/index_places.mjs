@@ -20,10 +20,10 @@ if (existsSync(descPath)) {
 }
 
 const docs = [
-  ...venue.booths.map((b) => ({ place_id: b.id, name: b.name ?? `Booth ${b.number}`, booth: b.number, kind: 'booth', tier: b.tier, aliases: [`booth ${b.number}`] })),
+  ...venue.booths.map((b) => ({ place_id: b.id, name: b.name ?? `Booth ${b.number}`, booth: b.number, kind: 'booth', tier: b.tier, aliases: [`booth ${b.number}`], tags: b.tags })),
   ...venue.areas.map((a) => ({ place_id: a.id, name: a.name, kind: a.kind, aliases: [] })),
   ...venue.points.map((p) => ({ place_id: p.id, name: p.name, kind: p.kind, aliases: p.kind === 'restroom' ? ['bathroom', 'toilet', 'wc'] : [] })),
-].map((d) => ({ ...d, venue: venueId, description: descriptions.get(d.place_id) ?? descriptions.get(d.booth ?? '') ?? d.name }));
+].map(({ tags, ...d }) => ({ ...d, venue: venueId, description: descriptions.get(d.place_id) ?? descriptions.get(d.booth ?? '') ?? (tags ? `${d.name}: ${tags}` : d.name) }));
 
 async function es(method, path, body, type = 'application/json') {
   const r = await fetch(`${url}${path}`, { method, headers: { Authorization: `ApiKey ${key}`, 'Content-Type': type }, body });
