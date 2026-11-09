@@ -99,3 +99,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Bruce, with Claude
 - **What changed:** A QR button in the From field opens the camera inside the app. Scanning a booth's code fills in where you are; codes for other venues or other sites are refused, not opened. The QR button replaces the empty-state text under the map, including the "Venue staff: QR codes to print" link (`/v/<venue>/qr` still works). Adds `jsqr` for browsers without a built-in QR reader (iPhone Safari). The spec previously said "no in-app scanner"; `docs/SPEC.md` is updated. Builds on PR #13.
 - **State:** Open. Needs the owner's sign-off on the product decision as well as code approval.
+
+### 16:52 · The route sheet collapses so the map gets the screen · PR pending
+- **By:** Chandler, with Claude
+- **What changed:** On phones, once a route is shown the sheet under the map can be collapsed: drag its handle down, or tap it. Collapsed, it shows one line (distance, time, destination) and the map refits the route to the larger area. Tap the line or drag up to open it again. Wide screens are unchanged.
+- **State:** Open. Checked in phone-sized Chromium only (drag, tap, reopen); not yet on a real iPhone.

@@ -44,6 +44,9 @@ export default function App() {
   const [online, setOnline] = useState(navigator.onLine);
   const [arriving, setArriving] = useState(false);
   const [scanning, setScanning] = useState(false);
+  const [collapsed, setCollapsed] = useState(false); // phone only: the sheet shrinks to one line so the map gets the screen
+  const dragY = useRef<number | null>(null);
+  const dragged = useRef(false);
   const hadRoute = useRef(false);
 
   useEffect(() => {
@@ -143,8 +146,30 @@ export default function App() {
 
       <MapView venue={venue} route={route} from={from} to={to} />
 
-      <section className="panel" aria-label="Plan a route">
-        <span className="grabber" aria-hidden="true" />
+      <section className={collapsed && route ? 'panel is-collapsed' : 'panel'} aria-label="Plan a route">
+        {route && (
+          <button
+            className="grabber"
+            aria-expanded={!collapsed}
+            aria-label={collapsed ? 'Show the route plan and directions' : 'Hide the route plan to see more of the map'}
+            onClick={() => { if (dragged.current) { dragged.current = false; return; } setCollapsed((c) => !c); }}
+            onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); dragY.current = e.clientY; dragged.current = false; }}
+            onPointerMove={(e) => {
+              if (dragY.current === null) return;
+              const dy = e.clientY - dragY.current;
+              if (Math.abs(dy) > 24) { setCollapsed(dy > 0); dragY.current = null; dragged.current = true; }
+            }}
+            onPointerUp={() => { dragY.current = null; }}
+            onPointerCancel={() => { dragY.current = null; }}
+          ><span aria-hidden="true" /></button>
+        )}
+        {collapsed && route && (
+          <button className="peek" onClick={() => setCollapsed(false)}>
+            <strong>{feet(route.meters)} ft</strong>
+            <span className="sum-time">about {Math.max(1, Math.round(route.seconds / 60))} min</span>
+            <span className="peek-to">to {route.to.title}</span>
+          </button>
+        )}
         <div className="plan">
           <div className="fields">
             <div className="field-stack">
