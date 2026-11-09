@@ -89,3 +89,13 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Chandler, with Claude
 - **What changed:** Panning or zooming the map on an iPhone left trails of old outline strokes behind. Map lines now get their on-screen width from the zoom level instead of `vector-effect: non-scaling-stroke`, which is what WebKit was failing to repaint. Lines look the same as before.
 - **State:** Merged. Confirmed on a real iPhone in Safari and Chrome using the pull request's preview build.
+
+### 16:36 · Plan moves to the bottom sheet on phones · PR #13
+- **By:** Bruce, with Claude
+- **What changed:** Interface only. On phones, From, To, swap and route type sit in the bottom sheet above the directions, within reach of a thumb; the top keeps a slim brand bar. The whole sheet scrolls when it is taller than the screen. Split out of the in-app scanner pull request, which needs its own approval.
+- **State:** Open
+
+### 16:28 · Scan a booth's QR code inside the app · PR #12
+- **By:** Bruce, with Claude
+- **What changed:** A QR button in the From field opens the camera inside the app. Scanning a booth's code fills in where you are; codes for other venues or other sites are refused, not opened. The QR button replaces the empty-state text under the map, including the "Venue staff: QR codes to print" link (`/v/<venue>/qr` still works). Adds `jsqr` for browsers without a built-in QR reader (iPhone Safari). The spec previously said "no in-app scanner"; `docs/SPEC.md` is updated. Builds on PR #13.
+- **State:** Open. Needs the owner's sign-off on the product decision as well as code approval.
