@@ -84,3 +84,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **What changed:** The `search` and `search_no_results` events now fire for every search, not only when Elasticsearch answers. They count what the attendee was shown, with `source` set to `elasticsearch` or `device`. Every Dash0 event also carries the build mode (`deployment.environment.name`) and the site's host name (`deployment.name`), so the dashboard can tell local runs from the live site.
 - **Also:** Vercel is no longer used. Removed `vercel.json` and the unused `@vercel/node` package, and changed the docs to describe the cluster deploy only. The Vercel project itself was not touched.
 - **State:** Open. Needs a second approval (search, deploy files). Sends nothing until the Dash0 keys are set.
+
+### 16:30 · Map no longer leaves line trails on iPhone · PR #11
+- **By:** Chandler, with Claude
+- **What changed:** Panning or zooming the map on an iPhone left trails of old outline strokes behind. Map lines now get their on-screen width from the zoom level instead of `vector-effect: non-scaling-stroke`, which is what WebKit was failing to repaint. Lines look the same as before.
+- **State:** Merged. Confirmed on a real iPhone in Safari and Chrome using the pull request's preview build.
