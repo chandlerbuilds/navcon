@@ -8,6 +8,7 @@ interface Props {
   route: Route | null;
   from?: Place;
   to?: Place;
+  children?: React.ReactNode;
 }
 
 const pts = (poly: Pt[]) => poly.map((p) => `${p[0]},${p[1]}`).join(' ');
@@ -19,7 +20,7 @@ function bboxOf(points: Pt[]): [number, number, number, number] {
 }
 
 /** The floor plan, drawn by the app itself so it works with no network. Pan with one finger, pinch to zoom. */
-export function MapView({ venue, route, from, to }: Props) {
+export function MapView({ venue, route, from, to, children }: Props) {
   const box = useRef<HTMLDivElement>(null);
   const world = useRef<SVGGElement>(null);
   const view = useRef({ k: 1, tx: 0, ty: 0 });
@@ -211,6 +212,7 @@ export function MapView({ venue, route, from, to }: Props) {
         <button onClick={() => { const el = box.current!; zoomAt(el.clientWidth / 2, el.clientHeight / 2, 1 / 1.5); }} aria-label="Zoom out"><IconMinus /></button>
         <button onClick={() => (focus ? fit(bboxOf(focus), 44) : fitAll())} aria-label={route ? 'Show the whole route' : 'Show the whole venue'}><IconFit /></button>
       </div>
+      {children}
     </div>
   );
 }

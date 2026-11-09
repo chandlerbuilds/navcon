@@ -104,3 +104,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Chandler, with Claude
 - **What changed:** On phones, once a route is shown the sheet under the map can be collapsed: drag its handle down, or tap it. Collapsed, it shows one line (distance, time, destination) and the map refits the route to the larger area. Tap the line or drag up to open it again. Wide screens are unchanged.
 - **State:** Open. Checked in phone-sized Chromium only (drag, tap, reopen); not yet on a real iPhone.
+
+### 17:00 · Route type moves to a floating button on the map; venue name becomes a chip · PR pending
+- **By:** Chandler, with Claude
+- **What changed:** The Standard / No stairs / Wheelchair switch left the sheet. A round button above the zoom controls opens a small menu with the three route types; choosing one closes the menu, and anything other than Standard turns the button blue with a check badge. The venue name moved from beside the Navcon logo, where it was cut off, to a chip on its own line under it.
+- **State:** Open. Checked in phone-sized and desktop Chromium; not yet on a real iPhone.
