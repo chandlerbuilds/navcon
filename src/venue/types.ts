@@ -1,7 +1,7 @@
 export type Pt = [number, number];
 
-export interface Booth { id: string; number: string; name: string | null; tier: string; poly: Pt[]; /** search keywords: what the exhibitor does */ tags?: string }
-export interface Area { id: string; name: string; kind: string; poly: Pt[] }
+export interface Booth { id: string; number: string; name: string | null; tier: string; poly: Pt[]; /** search keywords: what the exhibitor does */ tags?: string; /** known doors, as points on the shape's edge */ doors?: Pt[] }
+export interface Area { id: string; name: string; kind: string; poly: Pt[]; /** known doors, as points on the shape's edge */ doors?: Pt[] }
 export interface PointPlace { id: string; name: string; kind: string; at: Pt }
 export interface Zone { id: string; name: string; color: string; poly: Pt[] }
 
@@ -33,6 +33,8 @@ export interface Place {
   poly?: Pt[];
   /** extra words this place should be found by */
   tags?: string;
+  /** Known doors. When present, routes use them; otherwise any side of the shape will do. */
+  doors?: Pt[];
 }
 
 const TIER_LABEL: Record<string, string> = {
@@ -57,11 +59,11 @@ export function placesOf(v: VenueBundle): Place[] {
       id: b.id, kind: 'booth', number: b.number,
       title: b.name ?? `Booth ${b.number}`,
       subtitle: `Booth ${b.number} · ${TIER_LABEL[b.tier] ?? b.tier}`,
-      center: centroid(b.poly), poly: b.poly, tags: b.tags,
+      center: centroid(b.poly), poly: b.poly, tags: b.tags, doors: b.doors,
     });
   }
   for (const a of v.areas) {
-    out.push({ id: a.id, kind: a.kind, title: a.name, subtitle: KIND_LABEL[a.kind] ?? a.kind, center: centroid(a.poly), poly: a.poly });
+    out.push({ id: a.id, kind: a.kind, title: a.name, subtitle: KIND_LABEL[a.kind] ?? a.kind, center: centroid(a.poly), poly: a.poly, doors: a.doors });
   }
   for (const p of v.points) {
     out.push({ id: p.id, kind: p.kind, title: p.name, subtitle: KIND_LABEL[p.kind] ?? p.kind, center: p.at });

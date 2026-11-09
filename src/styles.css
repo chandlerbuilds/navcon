@@ -31,6 +31,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .outline { fill: none; stroke: #55524d; stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .area { fill: #fff; stroke: #55524d; stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .booth { stroke: #3f3d39; stroke-width: 0.75px; vector-effect: non-scaling-stroke; }
+.door { fill: #1e3a8a; }
 .dim { opacity: 0.3; }
 .is-from { stroke: var(--from); stroke-width: 4px; opacity: 1; }
 .is-to { stroke: var(--to); stroke-width: 4px; opacity: 1; }

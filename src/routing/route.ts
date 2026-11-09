@@ -55,11 +55,17 @@ export class Router {
   }
 
   /**
-   * The walkable cells that count as being "at" a place. A booth or open area gives
-   * the band of floor around it, so a route can use whichever side suits the trip.
+   * The walkable cells that count as being "at" a place.
+   * A place with known doors is entered and left through a door, always.
+   * Otherwise a booth or open area gives the band of floor around it, so a
+   * route can use whichever side suits the trip.
    */
   access(place: Place, profile: Profile): number[] {
     const g = this.grid(profile);
+    if (place.doors?.length) {
+      const cells = place.doors.map((d) => accessCell(g, d, 15)).filter((c) => c >= 0);
+      if (cells.length) return [...new Set(cells)];
+    }
     if (place.poly) {
       const cells = accessCells(g, place.poly);
       if (cells.length) return cells;

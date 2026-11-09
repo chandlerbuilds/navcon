@@ -137,6 +137,14 @@ export function MapView({ venue, route, from, to }: Props) {
     return out;
   }, [venue, route, from, to]);
 
+  // dotted link from the end of the route into the place: to its door if it has one, else to its middle
+  const spur = (p: Pt, place: Place) => {
+    let t = place.center;
+    if (place.doors?.length) t = place.doors.reduce((a, b) => (Math.hypot(a[0] - p[0], a[1] - p[1]) <= Math.hypot(b[0] - p[0], b[1] - p[1]) ? a : b));
+    return <line className="spur" x1={p[0]} y1={p[1]} x2={t[0]} y2={t[1]} />;
+  };
+  const doors = useMemo(() => [...venue.booths, ...venue.areas].flatMap((x) => (x.doors ?? []).map((d, i) => ({ key: `${x.id}-${i}`, d }))), [venue]);
+
   const routePts = route ? pts(route.path) : '';
   const startDot = route ? route.path[0] : from?.center;
   const endDot = route ? route.path[route.path.length - 1] : to?.center;
@@ -149,10 +157,11 @@ export function MapView({ venue, route, from, to }: Props) {
           <polygon points={pts(venue.outline)} className="outline" />
           {areas.map(({ a }) => <polygon key={a.id} points={pts(a.poly)} className={cls(a.id, 'area')} />)}
           {booths.map(({ b }) => <polygon key={b.id} points={pts(b.poly)} className={cls(b.id, 'booth')} fill={venue.tiers[b.tier] ?? '#ccc'} />)}
-          {route && route.from.poly && <line className="spur" x1={route.path[0][0]} y1={route.path[0][1]} x2={route.from.center[0]} y2={route.from.center[1]} />}
-          {route && route.to.poly && <line className="spur" x1={route.path[route.path.length - 1][0]} y1={route.path[route.path.length - 1][1]} x2={route.to.center[0]} y2={route.to.center[1]} />}
+          {route && route.from.poly && spur(route.path[0], route.from)}
+          {route && route.to.poly && spur(route.path[route.path.length - 1], route.to)}
           {route && <polyline points={routePts} className="route-case" />}
           {route && <polyline points={routePts} className="route-line" />}
+          {doors.map(({ key, d }) => <rect key={key} className="door" x={d[0] - 0.6} y={d[1] - 0.6} width={1.2} height={1.2} />)}
           {venue.points.filter((p) => p.kind === 'hall').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl hall">{p.name.toUpperCase()}</text>
           ))}

@@ -89,6 +89,11 @@ AREAS = {
     (54, 614, 70, 630): ("headshots", "Headshots", "service"),
     (75, 622, 93, 640): ("dash0-lounge", "Dash0 Lounge", "lounge"),
 }
+# Known doors, by place id, as PDF points on the edge of the shape. A place listed here is always
+# entered and left through one of its doors. Places not listed can be reached from any side.
+# This map marks no doors, so the table starts empty.
+DOORS = {}
+
 # White shapes that are booths, not service areas: bbox -> booth number.
 WHITE_BOOTHS = {(138, 521, 161, 544): "140"}
 # White shapes to ignore (logo plates inside another area, label backgrounds).
@@ -271,6 +276,8 @@ def main(pdf_path, png_path, exhibitors_path, out_path, keywords_path=None):
             booth = {"id": f"b{num}", "number": num, "name": names.get(num), "tier": s["tier"], "poly": to_m(s["poly"])}
             if num in tags:
                 booth["tags"] = tags[num]
+            if booth["id"] in DOORS:
+                booth["doors"] = [pt_m(x, y) for x, y in DOORS[booth["id"]]]
             booths.append(booth)
         booths.sort(key=lambda b: b["number"])
         tiers["feature"] = "#ffffff"
@@ -284,7 +291,10 @@ def main(pdf_path, png_path, exhibitors_path, out_path, keywords_path=None):
                     print("unlabelled white area skipped:", k, file=sys.stderr)
                 continue
             aid, name, kind = AREAS[k]
-            areas.append({"id": aid, "name": name, "kind": kind, "poly": to_m(poly_of(o))})
+            area = {"id": aid, "name": name, "kind": kind, "poly": to_m(poly_of(o))}
+            if aid in DOORS:
+                area["doors"] = [pt_m(x, y) for x, y in DOORS[aid]]
+            areas.append(area)
         missing = [v[0] for k, v in AREAS.items() if k not in white]
         if missing:
             raise SystemExit(f"labelled areas not found in the PDF: {missing}")

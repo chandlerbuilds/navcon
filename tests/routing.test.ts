@@ -135,6 +135,21 @@ describe('routes', () => {
     if (back.ok) expect(back.route.path[back.route.path.length - 1][1]).toBeGreaterThan(south);
   });
 
+  it('use the door when a place has one, even if another side is nearer', () => {
+    const withDoor = structuredClone(venue);
+    const theater = withDoor.areas.find((a) => a.id === 'cloud-native-theater')!;
+    const xs = theater.poly.map((p) => p[0]), ys = theater.poly.map((p) => p[1]);
+    const eastDoor: Pt = [Math.max(...xs), (Math.min(...ys) + Math.max(...ys)) / 2];
+    theater.doors = [eastDoor];
+    const end = (o: ReturnType<Router['route']>) => (o.ok ? o.route.path[o.route.path.length - 1] : ([NaN, NaN] as Pt));
+    const start = (o: ReturnType<Router['route']>) => (o.ok ? o.route.path[0] : ([NaN, NaN] as Pt));
+    const doorRouter = new Router(withDoor);
+    // coming up from the south, the nearest side is not the east one
+    expect(dist(end(router.route('b243', 'cloud-native-theater', 'standard')), eastDoor)).toBeGreaterThan(5);
+    expect(dist(end(doorRouter.route('b243', 'cloud-native-theater', 'standard')), eastDoor)).toBeLessThan(2.5);
+    expect(dist(start(doorRouter.route('cloud-native-theater', 'b243', 'standard')), eastDoor)).toBeLessThan(2.5);
+  });
+
   it('routes across the whole venue quickly', () => {
     router.grid('standard');
     const t0 = performance.now();

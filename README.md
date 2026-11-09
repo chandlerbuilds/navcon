@@ -7,7 +7,8 @@ First venue: KubeCon + CloudNativeCon North America 2026, Solutions Showcase (23
 ## How it works
 
 - **Venue bundle.** `tools/build_venue.py` reads a vector floor-plan PDF and writes `public/venues/<id>.json`: the hall outline, every booth with its number, service areas, restrooms and entrances. Booth shapes and numbers are read from the PDF automatically; exhibitor names come from `data/<id>/exhibitors.tsv`.
-- **Routing on the phone.** `src/routing` subtracts the obstacles from the hall, grows them by a clearance margin, lays a 0.5 m grid over what is left and runs A*. No paths are drawn by hand.
+- **Routing on the phone.** `src/routing` subtracts the obstacles from the hall, grows them by a clearance margin, lays a 0.5 m grid over what is left and runs A*. Cells near walls cost more and every turn costs distance, so routes run down the middle of aisles with 45 and 90 degree turns. No paths are drawn by hand.
+- **Where a route starts and ends.** If a place has a door (`doors` in the venue bundle), routes use it. If it has none, a route may use any side of the place and picks the one that suits the trip.
 - **Three route types.** Standard, no stairs and wheelchair. Wheelchair keeps 0.5 m of clearance instead of 0.3 m.
 - **QR links.** `/v/<venue>?from=<place-id>` sets the start. `/v/<venue>/qr` prints a code for every place.
 - **Offline.** A service worker caches the app and the venue bundle. Search falls back to an on-device match.
