@@ -125,62 +125,58 @@ export default function App() {
 
   return (
     <div className="app">
-      <section className="top" aria-label="Plan a route">
-        <header className="brand">
-          <img src="/icon.svg" alt="" width={22} height={22} />
-          <strong>Navcon</strong>
-          <span className="venue">{venue.name}</span>
-          {RADAR_KEY && venue.geo && <button className="link-btn" onClick={() => setArriving(true)}><IconPin size={16} />Getting here</button>}
-        </header>
-
-        <div className="fields">
-          <div className="field-stack">
-            <button className="field" onClick={() => setPicking('from')}>
-              <span className="tag tag-from" aria-hidden="true">A</span>
-              <span className="f-label">From</span>
-              <span className={from ? 'f-value' : 'f-value empty'}>{from ? from.title : 'Where are you?'}</span>
-            </button>
-            <button className="field" onClick={() => setPicking('to')}>
-              <span className="tag tag-to" aria-hidden="true">B</span>
-              <span className="f-label">To</span>
-              <span className={to ? 'f-value' : 'f-value empty'}>{to ? to.title : 'Where to?'}</span>
-            </button>
-          </div>
-          <button className="swap" onClick={() => { setFromId(toId); setToId(fromId); }} disabled={!from && !to} aria-label="Swap start and destination"><IconSwap /></button>
-        </div>
-
-        <div className="seg" role="group" aria-label="Route type">
-          {PROFILES.map((p) => (
-            <button key={p} aria-pressed={profile === p} onClick={() => setProfile(p)}>{PROFILE_LABEL[p]}</button>
-          ))}
-        </div>
-
-        {!online && <p className="banner"><IconOffline />You are offline. Routes still work; search matches names and booth numbers only.</p>}
-        {notice && <p className="banner" role="status">{notice}</p>}
-      </section>
+      <header className="top brand">
+        <img src="/icon.svg" alt="" width={22} height={22} />
+        <strong>Navcon</strong>
+        <span className="venue">{venue.name}</span>
+        {RADAR_KEY && venue.geo && <button className="link-btn" onClick={() => setArriving(true)}><IconPin size={16} />Getting here</button>}
+      </header>
 
       <MapView venue={venue} route={route} from={from} to={to} />
 
-      <section className="panel" aria-live="polite">
+      <section className="panel" aria-label="Plan a route">
         <span className="grabber" aria-hidden="true" />
-        {route ? (
-          <>
-            <p className="summary">
-              <span className="sum-main"><strong>{feet(route.meters)} ft</strong><span className="sum-time">about {Math.max(1, Math.round(route.seconds / 60))} min</span></span>
-              <span className="sum-meta">{Math.round(route.meters)} m · {PROFILE_LABEL[route.profile]} route</span>
-            </p>
-            <ol className="steps">{route.steps.map((s, i) => <li key={i}>{s.text}</li>)}</ol>
-            <p className="hint">Scan another booth's QR code on the way to update where you are.</p>
-          </>
-        ) : outcome && !outcome.ok ? (
-          <p className="summary alert" role="alert">{outcome.reason}</p>
-        ) : (
-          <>
-            <p className="lead">{from ? `You are at ${from.title}. Choose where to go.` : 'Scan a booth’s QR code, or tell us where you are.'}</p>
-            <p className="hint">This single-level floor has no stairs, so all three route types are step-free. Wheelchair routes keep extra clearance.</p>
-            <p className="hint"><a href={`/v/${venue.id}/qr`}>Venue staff: QR codes to print</a></p>
-          </>
-        )}
+        <div className="plan">
+          <div className="fields">
+            <div className="field-stack">
+              <button className="field" onClick={() => setPicking('from')}>
+                <span className="tag tag-from" aria-hidden="true">A</span>
+                <span className="f-label">From</span>
+                <span className={from ? 'f-value' : 'f-value empty'}>{from ? from.title : 'Where are you?'}</span>
+              </button>
+              <button className="field" onClick={() => setPicking('to')}>
+                <span className="tag tag-to" aria-hidden="true">B</span>
+                <span className="f-label">To</span>
+                <span className={to ? 'f-value' : 'f-value empty'}>{to ? to.title : 'Where to?'}</span>
+              </button>
+            </div>
+            <button className="swap" onClick={() => { setFromId(toId); setToId(fromId); }} disabled={!from && !to} aria-label="Swap start and destination"><IconSwap /></button>
+          </div>
+
+          <div className="seg" role="group" aria-label="Route type">
+            {PROFILES.map((p) => (
+              <button key={p} aria-pressed={profile === p} onClick={() => setProfile(p)}>{PROFILE_LABEL[p]}</button>
+            ))}
+          </div>
+
+          {!online && <p className="banner"><IconOffline />You are offline. Routes still work; search matches names and booth numbers only.</p>}
+          {notice && <p className="banner" role="status">{notice}</p>}
+        </div>
+
+        <div className="directions" aria-live="polite">
+          {route ? (
+            <>
+              <p className="summary">
+                <span className="sum-main"><strong>{feet(route.meters)} ft</strong><span className="sum-time">about {Math.max(1, Math.round(route.seconds / 60))} min</span></span>
+                <span className="sum-meta">{Math.round(route.meters)} m · {PROFILE_LABEL[route.profile]} route</span>
+              </p>
+              <ol className="steps">{route.steps.map((s, i) => <li key={i}>{s.text}</li>)}</ol>
+              <p className="hint">Scan another booth's QR code on the way to update where you are.</p>
+            </>
+          ) : outcome && !outcome.ok ? (
+            <p className="summary alert" role="alert">{outcome.reason}</p>
+          ) : null}
+        </div>
       </section>
 
       {arriving && RADAR_KEY && (
