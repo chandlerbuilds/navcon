@@ -78,3 +78,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Bruce, with Claude. Reviewed by Gitar.
 - **What changed:** Interface only; routing and search behave as before. On phones the route plan sits in a card above the map and the directions in a sheet below it; on wide screens both move to a column beside the map. The navy header is gone, From and To share one box, route types are a segmented control, and the directions lead with distance and walking time. Icons are drawn instead of text characters. Every control is at least 44 px tall.
 - **State:** Open
+
+### 16:30 · Map no longer leaves line trails on iPhone · PR pending
+- **By:** Chandler, with Claude
+- **What changed:** Panning or zooming the map on an iPhone left trails of old outline strokes behind. Map lines now get their on-screen width from the zoom level instead of `vector-effect: non-scaling-stroke`, which is what WebKit was failing to repaint. Lines look the same as before.
+- **State:** Open. Checked in phone-sized Chromium; the trails only show on a real iPhone, so it needs checking there.
