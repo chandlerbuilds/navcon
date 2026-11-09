@@ -8,7 +8,7 @@ const LEN = [1, Math.SQRT2, 1, Math.SQRT2, 1, Math.SQRT2, 1, Math.SQRT2];
 /** Cost of changing direction by 0, 45, 90, 135 and 180 degrees, in metres of walking. Keeps routes to a few clean turns. */
 const TURN = [0, 2, 3, 7, 12];
 /** Walking against the grain of the local aisles (diagonally between square booths, or squarely between slanted ones) costs this much more. */
-const OFF_AXIS = 1.5;
+const OFF_AXIS = 1;
 
 /**
  * Walking is never cheaper than 1 per metre and is usually dearer (aisle cost, turns), so the
