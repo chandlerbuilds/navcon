@@ -12,6 +12,7 @@ export interface VenueBundle {
   subtitle: string;
   version: number;
   scaleNote: string;
+  geo?: { place: string; address: string; lat: number; lng: number };
   size: Pt;
   outline: Pt[];
   zones: Zone[];

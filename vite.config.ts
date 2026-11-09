@@ -25,6 +25,8 @@ export default defineConfig({
       workbox: {
         // the venue bundle is precached, so routing works with no signal after the first load
         globPatterns: ['**/*.{js,css,html,svg,png,json}'],
+        // the Radar arrival map is online-only and large, so it is fetched on demand instead
+        globIgnores: ['**/radar-*', '**/maplibre-*', '**/plugin-maps-*', '**/dist-*', '**/ArrivalSheet-*'],
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api\//],
       },

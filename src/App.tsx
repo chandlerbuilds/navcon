@@ -7,6 +7,8 @@ import { SearchSheet } from './ui/SearchSheet';
 import type { Place, VenueBundle } from './venue/types';
 
 const QrSheet = lazy(() => import('./ui/QrSheet'));
+const ArrivalSheet = lazy(() => import('./ui/ArrivalSheet'));
+const RADAR_KEY = import.meta.env.VITE_RADAR_KEY as string | undefined;
 
 const DEFAULT_VENUE = 'kcna26';
 const PROFILES: Profile[] = ['standard', 'nostairs', 'wheelchair'];
@@ -38,6 +40,7 @@ export default function App() {
   const [picking, setPicking] = useState<'from' | 'to' | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [online, setOnline] = useState(navigator.onLine);
+  const [arriving, setArriving] = useState(false);
   const hadRoute = useRef(false);
 
   useEffect(() => {
@@ -124,6 +127,7 @@ export default function App() {
       <header className="bar">
         <strong>Navcon</strong>
         <span className="venue">{venue.name}</span>
+        {RADAR_KEY && venue.geo && <button className="bar-btn" onClick={() => setArriving(true)}>Getting here</button>}
       </header>
 
       <section className="form" aria-label="Plan a route">
@@ -171,6 +175,12 @@ export default function App() {
           </>
         )}
       </section>
+
+      {arriving && RADAR_KEY && (
+        <Suspense fallback={null}>
+          <ArrivalSheet venue={venue} apiKey={RADAR_KEY} onClose={() => setArriving(false)} onStartAtEntrance={() => { setFromId('main-entrance'); setArriving(false); }} />
+        </Suspense>
+      )}
 
       {picking && (
         <SearchSheet

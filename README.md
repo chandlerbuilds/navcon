@@ -18,7 +18,7 @@ First venue: KubeCon + CloudNativeCon North America 2026, Solutions Showcase (23
 | --- | --- | --- |
 | Elasticsearch | `api/search.ts`, `tools/index_places.mjs` | Typo-tolerant and meaning-based place search |
 | Dash0 | `src/telemetry.ts`, Vercel log drain | Sessions, errors, custom events (`qr_scan`, `search`, `route_requested`, ...) |
-| Radar | `src/radar.ts` (in progress) | Venue geofence check, arrival map, walking time to the entrance |
+| Radar | `src/radar.ts`, `src/ui/ArrivalSheet.tsx`, `tools/radar_geofence.mjs` | "Getting here": venue map, address lookup, on-site geofence check, walking time to the venue |
 | Gitar | this repository | Reviews pull requests and repairs failing CI, including the routing checks |
 
 ## Develop

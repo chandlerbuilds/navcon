@@ -288,6 +288,8 @@ def main(pdf_path, png_path, exhibitors_path, out_path):
             "version": 1,
             "units": "m",
             "scaleNote": "1 PDF point = %.4f m, assuming a platinum booth is 20 ft square" % M_PER_PT,
+            # Approximate position; the app refines it by geocoding the address with Radar.
+            "geo": {"place": "Salt Palace Convention Center", "address": "100 S West Temple St, Salt Lake City, UT 84101", "lat": 40.7672, "lng": -111.8955},
             "size": [round(max(xs) + 6, 1), round(max(ys) + 6, 1)],
             "outline": to_m(outline),
             "zones": [{k: v for k, v in z.items() if k != "at"} for z in zones],
