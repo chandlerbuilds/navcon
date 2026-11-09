@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { loadRadar } from '../radar';
+import { IconBack } from './icons';
 import type { VenueBundle } from '../venue/types';
 
 interface Props { venue: VenueBundle; apiKey: string; onClose: () => void; onStartAtEntrance: () => void }
@@ -64,7 +65,7 @@ export default function ArrivalSheet({ venue, apiKey, onClose, onStartAtEntrance
   return (
     <div className="sheet" role="dialog" aria-modal="true" aria-label="Getting here">
       <div className="sheet-bar">
-        <button className="icon-btn" onClick={onClose} aria-label="Back">←</button>
+        <button className="icon-btn" onClick={onClose} aria-label="Back"><IconBack /></button>
         <strong>Getting here</strong>
       </div>
       <div className="arrival-map" ref={box} />

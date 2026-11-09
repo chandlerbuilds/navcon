@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { Route } from '../routing/route';
+import { IconFit, IconMinus, IconPlus } from './icons';
 import { centroid, type Place, type Pt, type VenueBundle } from '../venue/types';
 
 interface Props {
@@ -194,9 +195,9 @@ export function MapView({ venue, route, from, to }: Props) {
         </g>
       </svg>
       <div className="map-ctl">
-        <button onClick={() => { const el = box.current!; zoomAt(el.clientWidth / 2, el.clientHeight / 2, 1.5); }} aria-label="Zoom in">+</button>
-        <button onClick={() => { const el = box.current!; zoomAt(el.clientWidth / 2, el.clientHeight / 2, 1 / 1.5); }} aria-label="Zoom out">−</button>
-        <button onClick={() => (focus ? fit(bboxOf(focus), 44) : fitAll())} aria-label={route ? 'Show the whole route' : 'Show the whole venue'}>⤢</button>
+        <button onClick={() => { const el = box.current!; zoomAt(el.clientWidth / 2, el.clientHeight / 2, 1.5); }} aria-label="Zoom in"><IconPlus /></button>
+        <button onClick={() => { const el = box.current!; zoomAt(el.clientWidth / 2, el.clientHeight / 2, 1 / 1.5); }} aria-label="Zoom out"><IconMinus /></button>
+        <button onClick={() => (focus ? fit(bboxOf(focus), 44) : fitAll())} aria-label={route ? 'Show the whole route' : 'Show the whole venue'}><IconFit /></button>
       </div>
     </div>
   );
