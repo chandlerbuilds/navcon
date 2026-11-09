@@ -83,7 +83,7 @@ Built but never run against the real service (waiting for keys in Vercel, then a
 | Elasticsearch | `ELASTICSEARCH_URL`, `ELASTICSEARCH_API_KEY` | `npm run index:places`, then check `/api/search?venue=kcna26&q=dash0` |
 | Dash0 | `VITE_DASH0_ENDPOINT`, `VITE_DASH0_TOKEN`; install the Dash0 integration on Vercel | Confirm events arrive; build the dashboard and one alert |
 | Radar | `VITE_RADAR_KEY`; `RADAR_SECRET_KEY=... node tools/radar_geofence.mjs kcna26` | Open "Getting here" on a phone |
-| Gitar | Install on this repository | Open a pull request with a failing routing check for the demo |
+| Gitar | Installed: a Gitar check ran on pull request 3 | Open a pull request with a failing routing check for the demo |
 
 Not started: the admin portal (see the spec), Dash0 dashboard and alert.
 

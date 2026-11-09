@@ -168,7 +168,7 @@ Dash0
 - Still to make: one dashboard for organizers and one alert on search or route failures.
 
 Gitar
-- To be installed on the GitHub repository.
+- Installed on the GitHub repository; its check ran on pull request 3.
 - CI runs type checks, the routing checks and a build on every pull request.
 
 ## Robustness, accessibility and privacy
@@ -203,7 +203,7 @@ Speed targets
 | --- | --- | --- |
 | Must demo | Public link on real venue data: QR link, search, three profiles, route with text steps, offline routing | Live |
 | Must demo | Elasticsearch search, Radar Getting here screen and geofence, Dash0 SDK, events and dashboard | Built, waiting for keys; never run against the real services |
-| Must demo | Gitar on the repository with routing checks in CI | CI live; Gitar not installed |
+| Must demo | Gitar on the repository with routing checks in CI | CI live; Gitar installed. The demo pull request with a failing check is still to do. |
 | If time allows | A thin slice of the admin portal: sign in, edit places, republish, download the QR sheet | Not started |
 | After today | Obstacle editor with PDF import, multiple organizations, floors, shuttle legs, closures | Not started |
 
