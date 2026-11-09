@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { pointInPoly } from '../routing/geometry';
 import type { Route } from '../routing/route';
 import { centroid, type Place, type Pt, type VenueBundle } from '../venue/types';
 
@@ -137,6 +138,20 @@ export function MapView({ venue, route, from, to }: Props) {
     return out;
   }, [venue, route, from, to]);
 
+  // dotted arc from the end of the route into the place: to its door if it has one, else to its middle
+  const spur = (p: Pt, place: Place) => {
+    let t = place.center;
+    if (place.doors?.length) t = place.doors.reduce((a, b) => (Math.hypot(a[0] - p[0], a[1] - p[1]) <= Math.hypot(b[0] - p[0], b[1] - p[1]) ? a : b));
+    // a gentle arc of round dots, the way map apps show the last few steps off the path
+    const dx = t[0] - p[0], dy = t[1] - p[1];
+    const bend = (side: number): Pt => [(p[0] + t[0]) / 2 - dy * 0.18 * side, (p[1] + t[1]) / 2 + dx * 0.18 * side];
+    // bow toward the inside of the place, so the dots never stray over a wall or a neighbour
+    let c = bend(1);
+    if (place.poly && !pointInPoly(c[0], c[1], place.poly) && pointInPoly(bend(-1)[0], bend(-1)[1], place.poly)) c = bend(-1);
+    return <path className="spur" d={`M${p[0]} ${p[1]} Q${c[0]} ${c[1]} ${t[0]} ${t[1]}`} />;
+  };
+  const doors = useMemo(() => [...venue.booths, ...venue.areas].flatMap((x) => (x.doors ?? []).map((d, i) => ({ key: `${x.id}-${i}`, d }))), [venue]);
+
   const routePts = route ? pts(route.path) : '';
   const startDot = route ? route.path[0] : from?.center;
   const endDot = route ? route.path[route.path.length - 1] : to?.center;
@@ -149,10 +164,11 @@ export function MapView({ venue, route, from, to }: Props) {
           <polygon points={pts(venue.outline)} className="outline" />
           {areas.map(({ a }) => <polygon key={a.id} points={pts(a.poly)} className={cls(a.id, 'area')} />)}
           {booths.map(({ b }) => <polygon key={b.id} points={pts(b.poly)} className={cls(b.id, 'booth')} fill={venue.tiers[b.tier] ?? '#ccc'} />)}
-          {route && route.from.poly && <line className="spur" x1={route.path[0][0]} y1={route.path[0][1]} x2={route.from.center[0]} y2={route.from.center[1]} />}
-          {route && route.to.poly && <line className="spur" x1={route.path[route.path.length - 1][0]} y1={route.path[route.path.length - 1][1]} x2={route.to.center[0]} y2={route.to.center[1]} />}
+          {route && route.from.poly && spur(route.path[0], route.from)}
+          {route && route.to.poly && spur(route.path[route.path.length - 1], route.to)}
           {route && <polyline points={routePts} className="route-case" />}
           {route && <polyline points={routePts} className="route-line" />}
+          {doors.map(({ key, d }) => <rect key={key} className="door" x={d[0] - 0.6} y={d[1] - 0.6} width={1.2} height={1.2} />)}
           {venue.points.filter((p) => p.kind === 'hall').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl hall">{p.name.toUpperCase()}</text>
           ))}

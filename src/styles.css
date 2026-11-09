@@ -31,6 +31,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .outline { fill: none; stroke: #55524d; stroke-width: 3px; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .area { fill: #fff; stroke: #55524d; stroke-width: 1px; vector-effect: non-scaling-stroke; }
 .booth { stroke: #3f3d39; stroke-width: 0.75px; vector-effect: non-scaling-stroke; }
+.door { fill: #1e3a8a; }
 .dim { opacity: 0.3; }
 .is-from { stroke: var(--from); stroke-width: 4px; opacity: 1; }
 .is-to { stroke: var(--to); stroke-width: 4px; opacity: 1; }
@@ -42,7 +43,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .lbl.pin { font-size: calc(12px * var(--ik, 1)); font-weight: 700; fill: #111; stroke: #fff; stroke-width: calc(3.5px * var(--ik, 1)); paint-order: stroke; stroke-linejoin: round; }
 .route-case { fill: none; stroke: #fff; stroke-width: 9px; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
 .route-line { fill: none; stroke: #1d4ed8; stroke-width: 5px; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-linecap: round; }
-.spur { stroke: #1d4ed8; stroke-width: 3px; stroke-dasharray: 2 5; vector-effect: non-scaling-stroke; stroke-linecap: round; }
+.spur { fill: none; stroke: #1d4ed8; stroke-width: 5px; stroke-dasharray: 0.1 10; vector-effect: non-scaling-stroke; stroke-linecap: round; }
 .dot { stroke: #fff; stroke-width: 3px; vector-effect: non-scaling-stroke; }
 .dot-from { fill: var(--from); } .dot-to { fill: var(--to); }
 .map-ctl { position: absolute; right: 10px; bottom: 10px; display: grid; gap: 6px; }

@@ -31,9 +31,10 @@ describe('venue data', () => {
 describe('reachability', () => {
   for (const profile of profiles) {
     it(`every place has a walkable access point (${profile})`, () => {
+      const g = router.grid(profile);
       const unreachable = router.places.filter((p) => {
-        const c = router.access(p, profile);
-        return c < 0 || dist(cellCenter(router.grid(profile), c), p.center) > 40;
+        const cells = router.access(p, profile);
+        return !cells.length || Math.min(...cells.map((c) => dist(cellCenter(g, c), p.center))) > 45;
       });
       expect(unreachable.map((p) => p.id)).toEqual([]);
     });
@@ -83,6 +84,70 @@ describe('routes', () => {
         expect(worst, `${a} -> ${b} (${profile})`).toBeGreaterThanOrEqual(MARGIN[profile] - 0.05);
       }
     }
+  });
+
+  it('turn only in 45 degree steps, and squarely in the square halls', () => {
+    for (const [a, b] of pairs(60)) {
+      const r = router.route(a, b, 'standard');
+      if (!r.ok) continue;
+      const { path } = r.route;
+      for (let i = 1; i < path.length; i++) {
+        const deg = (Math.atan2(path[i][1] - path[i - 1][1], path[i][0] - path[i - 1][0]) * 180) / Math.PI;
+        const off = Math.abs(deg / 45 - Math.round(deg / 45));
+        expect(off, `${a} -> ${b} has a segment at ${deg.toFixed(1)} degrees`).toBeLessThan(0.001);
+      }
+    }
+    // Hall 3 booths stand square to the walls, so a route between two of them has no diagonal legs
+    const r = router.route('b259', 'b327', 'standard');
+    expect(r.ok).toBe(true);
+    if (r.ok) {
+      for (let i = 1; i < r.route.path.length; i++) {
+        const [p, q] = [r.route.path[i - 1], r.route.path[i]];
+        expect(Math.abs(p[0] - q[0]) < 1e-6 || Math.abs(p[1] - q[1]) < 1e-6, 'diagonal leg in a square hall').toBe(true);
+      }
+    }
+  });
+
+  it('run down the middle of a wide aisle, not along its wall', () => {
+    const g = router.grid('standard');
+    const r = router.route('meal-halls-a-b', 'hall-2', 'standard');
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const { path } = r.route;
+    let sum = 0, n = 0;
+    for (let i = 1; i < path.length; i++) {
+      const steps = Math.max(1, Math.ceil(dist(path[i - 1], path[i]) / 0.5));
+      for (let k = 0; k <= steps; k++) {
+        const x = path[i - 1][0] + ((path[i][0] - path[i - 1][0]) * k) / steps, y = path[i - 1][1] + ((path[i][1] - path[i - 1][1]) * k) / steps;
+        sum += g.clear[Math.floor(y / g.cell) * g.w + Math.floor(x / g.cell)]; n++;
+      }
+    }
+    expect(sum / n, 'average distance from the nearest wall, in metres').toBeGreaterThan(1.5);
+  });
+
+  it('leave a place on the side that suits the trip, never from a cramped gap behind it', () => {
+    const store = venue.areas.find((a) => a.id === 'corner-store')!;
+    const south = Math.max(...store.poly.map((p) => p[1]));
+    const r = router.route('corner-store', 'b243', 'standard');
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.route.path[0][1], 'the route should start south of the Corner Store').toBeGreaterThan(south);
+    const back = router.route('b243', 'corner-store', 'standard');
+    if (back.ok) expect(back.route.path[back.route.path.length - 1][1]).toBeGreaterThan(south);
+  });
+
+  it('use the door when a place has one, even if another side is nearer', () => {
+    const withDoor = structuredClone(venue);
+    const theater = withDoor.areas.find((a) => a.id === 'cloud-native-theater')!;
+    const xs = theater.poly.map((p) => p[0]), ys = theater.poly.map((p) => p[1]);
+    const eastDoor: Pt = [Math.max(...xs), (Math.min(...ys) + Math.max(...ys)) / 2];
+    theater.doors = [eastDoor];
+    const end = (o: ReturnType<Router['route']>) => (o.ok ? o.route.path[o.route.path.length - 1] : ([NaN, NaN] as Pt));
+    const start = (o: ReturnType<Router['route']>) => (o.ok ? o.route.path[0] : ([NaN, NaN] as Pt));
+    const doorRouter = new Router(withDoor);
+    // coming up from the south, the nearest side is not the east one
+    expect(dist(end(router.route('b243', 'cloud-native-theater', 'standard')), eastDoor)).toBeGreaterThan(5);
+    expect(dist(end(doorRouter.route('b243', 'cloud-native-theater', 'standard')), eastDoor)).toBeLessThan(2.5);
+    expect(dist(start(doorRouter.route('cloud-native-theater', 'b243', 'standard')), eastDoor)).toBeLessThan(2.5);
   });
 
   it('routes across the whole venue quickly', () => {
