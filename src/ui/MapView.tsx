@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { pointInPoly } from '../routing/geometry';
 import type { Route } from '../routing/route';
 import { centroid, type Place, type Pt, type VenueBundle } from '../venue/types';
 
@@ -137,11 +138,17 @@ export function MapView({ venue, route, from, to }: Props) {
     return out;
   }, [venue, route, from, to]);
 
-  // dotted link from the end of the route into the place: to its door if it has one, else to its middle
+  // dotted arc from the end of the route into the place: to its door if it has one, else to its middle
   const spur = (p: Pt, place: Place) => {
     let t = place.center;
     if (place.doors?.length) t = place.doors.reduce((a, b) => (Math.hypot(a[0] - p[0], a[1] - p[1]) <= Math.hypot(b[0] - p[0], b[1] - p[1]) ? a : b));
-    return <line className="spur" x1={p[0]} y1={p[1]} x2={t[0]} y2={t[1]} />;
+    // a gentle arc of round dots, the way map apps show the last few steps off the path
+    const dx = t[0] - p[0], dy = t[1] - p[1];
+    const bend = (side: number): Pt => [(p[0] + t[0]) / 2 - dy * 0.18 * side, (p[1] + t[1]) / 2 + dx * 0.18 * side];
+    // bow toward the inside of the place, so the dots never stray over a wall or a neighbour
+    let c = bend(1);
+    if (place.poly && !pointInPoly(c[0], c[1], place.poly) && pointInPoly(bend(-1)[0], bend(-1)[1], place.poly)) c = bend(-1);
+    return <path className="spur" d={`M${p[0]} ${p[1]} Q${c[0]} ${c[1]} ${t[0]} ${t[1]}`} />;
   };
   const doors = useMemo(() => [...venue.booths, ...venue.areas].flatMap((x) => (x.doors ?? []).map((d, i) => ({ key: `${x.id}-${i}`, d }))), [venue]);
 
