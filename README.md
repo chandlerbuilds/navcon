@@ -18,7 +18,7 @@ First venue: KubeCon + CloudNativeCon North America 2026, Solutions Showcase (23
 | Tool | Where | What it does |
 | --- | --- | --- |
 | Elasticsearch | `api/search.ts`, `tools/index_places.mjs` | Typo-tolerant and meaning-based place search |
-| Dash0 | `src/telemetry.ts`, Vercel log drain | Sessions, errors, custom events (`qr_scan`, `search`, `route_requested`, ...) |
+| Dash0 | `src/telemetry.ts` | Sessions, errors, custom events (`qr_scan`, `search`, `route_requested`, ...) |
 | Radar | `deploy/`, `argocd/application.yaml`, `Dockerfile`, `server.mjs` | Navcon runs on Kubernetes in the team namespace on the `lunzerr` cluster in Radar Cloud. Every push to `main` rolls out through Argo CD (see Deploy below). |
 | Gitar | `.gitar/review/`, `.github/workflows/ci.yml` | Reviews every pull request against the project's conventions and routing rules, and repairs failing CI, including the routing checks |
 

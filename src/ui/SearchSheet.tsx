@@ -31,14 +31,19 @@ export function SearchSheet({ venueId, places, title, quick, onPick, onClose }: 
     const timer = setTimeout(async () => {
       const ids = await searchRemote(venueId, query, ctl.signal);
       if (ctl.signal.aborted) return;
-      if (ids === null) { setLimited(true); setRemote(null); return; }
+      // Record what the attendee was shown: the service's results, or the on-device ones when
+      // the service is down or found nothing (the same rule as `results` below).
+      const report = (source: 'elasticsearch' | 'device', results: number) =>
+        track(results ? 'search' : 'search_no_results', { query_length: query.length, results, source });
+      if (ids === null) { setLimited(true); setRemote(null); report('device', local.length); return; }
       setLimited(false);
       const hits = ids.map((id) => byId.get(id)).filter((p): p is Place => !!p);
       setRemote({ q: query, hits });
-      track(hits.length ? 'search' : 'search_no_results', { query_length: query.length, results: hits.length, source: 'elasticsearch' });
+      if (hits.length) report('elasticsearch', hits.length);
+      else report('device', local.length);
     }, 220);
     return () => { ctl.abort(); clearTimeout(timer); };
-  }, [q, venueId, byId]);
+  }, [q, venueId, byId, local]);
 
   // Show on-device results at once; swap in the service's ranking when it answers for this query.
   const results = remote && remote.q === q.trim() && remote.hits.length ? remote.hits : local;
