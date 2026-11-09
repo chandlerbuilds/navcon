@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { pointInPoly } from '../routing/geometry';
 import type { Route } from '../routing/route';
 import { centroid, type Place, type Pt, type VenueBundle } from '../venue/types';
 
@@ -142,13 +141,13 @@ export function MapView({ venue, route, from, to }: Props) {
   const spur = (p: Pt, place: Place) => {
     let t = place.center;
     if (place.doors?.length) t = place.doors.reduce((a, b) => (Math.hypot(a[0] - p[0], a[1] - p[1]) <= Math.hypot(b[0] - p[0], b[1] - p[1]) ? a : b));
-    // a gentle arc of round dots, the way map apps show the last few steps off the path
+    // An arc of round dots, the way map apps show the last few steps off the path.
+    // It always bows toward the top of the screen (concave down), whichever way the route arrives.
     const dx = t[0] - p[0], dy = t[1] - p[1];
-    const bend = (side: number): Pt => [(p[0] + t[0]) / 2 - dy * 0.18 * side, (p[1] + t[1]) / 2 + dx * 0.18 * side];
-    // bow toward the inside of the place, so the dots never stray over a wall or a neighbour
-    let c = bend(1);
-    if (place.poly && !pointInPoly(c[0], c[1], place.poly) && pointInPoly(bend(-1)[0], bend(-1)[1], place.poly)) c = bend(-1);
-    return <path className="spur" d={`M${p[0]} ${p[1]} Q${c[0]} ${c[1]} ${t[0]} ${t[1]}`} />;
+    let nx = -dy, ny = dx; // one of the two perpendiculars to the chord
+    if (ny > 0 || (ny === 0 && nx > 0)) { nx = -nx; ny = -ny; } // take the one that points up; for a vertical chord, left
+    const cx = (p[0] + t[0]) / 2 + nx * 0.24, cy = (p[1] + t[1]) / 2 + ny * 0.24;
+    return <path className="spur" d={`M${p[0]} ${p[1]} Q${cx} ${cy} ${t[0]} ${t[1]}`} />;
   };
   const doors = useMemo(() => [...venue.booths, ...venue.areas].flatMap((x) => (x.doors ?? []).map((d, i) => ({ key: `${x.id}-${i}`, d }))), [venue]);
 
