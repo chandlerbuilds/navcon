@@ -1,0 +1,10 @@
+# Kept out of the image build context.
+.git
+.vercel
+**/node_modules
+dist
+**/*kubeconfig*
+**/.env
+**/.env.*
+**/*.pem
+**/*.key

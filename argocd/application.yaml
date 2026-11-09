@@ -1,0 +1,21 @@
+# Argo CD Application on the lunzerr cluster: deploys deploy/ on every push to main.
+# It replaces the starter's Application of the same name (which pointed at
+# fn-bruce/lunzer); apply it through Radar's MCP server (apply_resource) or Radar Cloud.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app
+  namespace: team-lunzerr
+spec:
+  project: team-lunzerr
+  source:
+    repoURL: https://github.com/chandlerbuilds/navcon.git
+    targetRevision: main
+    path: deploy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: team-lunzerr
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

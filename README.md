@@ -40,6 +40,24 @@ pdftoppm -r 200 -f 1 -l 1 -png map.pdf page
 python3 tools/build_venue.py map.pdf page-1.png data/kcna26/exhibitors.tsv public/venues/kcna26.json data/kcna26/keywords.tsv
 ```
 
+## Deploy (Radar)
+
+Every push to `main` deploys to the `lunzerr` cluster in Radar Cloud, at https://lunzerr.cnh.radarhq.io:
+
+1. `.github/workflows/deploy.yaml` builds the `Dockerfile`, pushes `ghcr.io/chandlerbuilds/navcon:<sha>` and commits the new tag to `deploy/kustomization.yaml`.
+2. Argo CD (`argocd/application.yaml`, namespace `team-lunzerr`) syncs `deploy/`.
+
+In the container, `server.mjs` serves `dist/`, runs `api/search.ts` as `/api/search` and answers `/healthz` and `/readyz`.
+
+- Browser keys (`VITE_RADAR_KEY`, `VITE_DASH0_ENDPOINT`, `VITE_DASH0_TOKEN`) are GitHub repository variables, baked into the bundle at build time.
+- Elasticsearch credentials come from the Secret `app-credentials` (keys `elasticsearch-url`, `elasticsearch-api-key`) in `team-lunzerr`. Create it in Radar Cloud; never commit it. Without it, search runs on the device.
+
+Run the image locally:
+
+```sh
+docker build -t navcon . && docker run --rm -p 8080:8080 navcon
+```
+
 ## Assumptions
 
 - `data/kcna26/keywords.tsv` holds short search keywords for exhibitors (what they do). They were written by hand from general knowledge and should be reviewed; exhibitors without a line are found by name and booth number only.
