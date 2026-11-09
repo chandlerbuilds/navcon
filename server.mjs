@@ -5,6 +5,7 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, join, normalize } from 'node:path';
+import { pipeline } from 'node:stream';
 import { fileURLToPath } from 'node:url';
 
 // Node 24 strips the TypeScript types on import; the file has only type-level syntax.
@@ -50,13 +51,29 @@ async function sendFile(res, rel, method) {
     'Cache-Control': immutable ? 'public, max-age=31536000, immutable' : 'no-cache',
   });
   if (method === 'HEAD') res.end();
-  else createReadStream(file).pipe(res);
+  else {
+    // pipeline closes the file when the client hangs up and turns read errors
+    // into a log line instead of an unhandled 'error' that kills the process.
+    pipeline(createReadStream(file), res, (err) => {
+      if (err && err.code !== 'ERR_STREAM_PREMATURE_CLOSE') {
+        console.error(JSON.stringify({ msg: 'send_failed', file, error: String(err) }));
+      }
+    });
+  }
   return true;
 }
 
 // The small slice of the Vercel request/response API that api/search.ts uses.
 function runVercelHandler(handler, req, res, url) {
   req.query = Object.fromEntries(url.searchParams);
+  // api/search.ts rate-limits on the first X-Forwarded-For entry. Vercel overwrites
+  // that header; the cluster gateway appends to it, so earlier entries are whatever
+  // the client sent. Keep only the hop the gateway added (or the socket peer).
+  const xff = String(req.headers['x-forwarded-for'] ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  req.headers['x-forwarded-for'] = xff.at(-1) ?? req.socket.remoteAddress ?? 'unknown';
   const vres = {
     setHeader: (k, v) => (res.setHeader(k, v), vres),
     status: (code) => ((res.statusCode = code), vres),
@@ -101,5 +118,9 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => console.log(JSON.stringify({ msg: 'listening', port: PORT, version: VERSION })));
 
-// Let in-flight requests finish when Kubernetes stops the pod.
-process.on('SIGTERM', () => server.close(() => process.exit(0)));
+// Kubernetes sends SIGTERM while the pod is still being removed from the Service
+// endpoints, so keep serving for a few seconds before refusing connections, then
+// let in-flight requests finish.
+process.on('SIGTERM', () => {
+  setTimeout(() => server.close(() => process.exit(0)), 5000);
+});
