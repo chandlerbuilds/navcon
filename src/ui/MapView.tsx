@@ -54,6 +54,18 @@ export function MapView({ venue, route, from, to }: Props) {
   }, [route, from, to]);
 
   useLayoutEffect(() => { if (focus) fit(bboxOf(focus), 44); else fitAll(); }, [focus, fit, fitAll]);
+  // Refit when the map's own area changes size, for example when the sheet below it is collapsed.
+  useEffect(() => {
+    const el = box.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    let first = true;
+    const ro = new ResizeObserver(() => {
+      if (first) { first = false; return; }
+      if (focus) fit(bboxOf(focus), 44); else fitAll();
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [focus, fit, fitAll]);
   useLayoutEffect(() => { apply(); }, [route, from, to, apply]);
 
   const zoomAt = useCallback((cx: number, cy: number, factor: number) => {

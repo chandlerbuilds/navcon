@@ -90,7 +90,15 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .plan { flex: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
 .directions { flex: 1 0 auto; min-height: 0; padding: 14px 4px 4px; }
 .directions:empty { padding: 0; }
-.grabber { position: absolute; top: 7px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--hair); }
+/* The handle is a real button: tap it, or drag it down or up, to collapse or open the sheet. */
+.grabber { position: absolute; top: 0; left: 50%; width: 96px; height: 28px; margin-left: -48px; padding: 0; border: 0; background: none; display: grid; place-items: start center; touch-action: none; }
+.grabber span { display: block; margin-top: 7px; width: 40px; height: 5px; border-radius: 3px; background: #b9b5ac; }
+.peek { display: none; }
+.panel.is-collapsed { overflow: hidden; padding-top: 26px; }
+.panel.is-collapsed .plan, .panel.is-collapsed .directions { display: none; }
+.panel.is-collapsed .peek { display: flex; align-items: baseline; gap: 10px; width: 100%; min-height: 44px; padding: 0 6px 4px; border: 0; background: none; text-align: left; color: var(--ink); }
+.peek strong { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.peek-to { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; color: var(--muted); }
 .summary { margin: 0 0 12px; display: grid; gap: 2px; }
 .sum-main { display: flex; align-items: baseline; gap: 10px; }
 .sum-main strong { font-size: 24px; font-weight: 700; letter-spacing: -0.02em; }
@@ -150,7 +158,10 @@ a { color: var(--brand); text-underline-offset: 3px; }
   .panel { grid-column: 1; grid-row: 2; margin: 0; border-radius: 0; box-shadow: none; max-height: none; padding: 8px 16px 16px; }
   .directions { margin-top: 14px; border-top: 1px solid var(--hair); padding: 16px 0 0; }
   .directions:empty { margin: 0; border: 0; padding: 0; }
-  .grabber { display: none; }
+  .grabber, .peek, .panel.is-collapsed .peek { display: none; }
+  .panel.is-collapsed { overflow: auto; padding: 8px 16px 16px; }
+  .panel.is-collapsed .plan { display: grid; }
+  .panel.is-collapsed .directions { display: block; }
   .map { grid-column: 2; grid-row: 1 / -1; margin: 0; border-left: 1px solid var(--line); }
   .map-ctl { bottom: 16px; right: 16px; }
   .sheet { right: auto; width: 380px; box-shadow: 6px 0 24px rgb(28 27 25 / 0.12); }
