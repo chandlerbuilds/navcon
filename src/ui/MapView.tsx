@@ -19,6 +19,19 @@ function bboxOf(points: Pt[]): [number, number, number, number] {
   return [x0, y0, x1, y1];
 }
 
+/** Break a vendor name into at most two short lines at word boundaries, with an ellipsis if it still does not fit. */
+function wrapName(name: string, max = 13): string[] {
+  const lines: string[] = [];
+  for (const word of name.split(/\s+/)) {
+    const last = lines[lines.length - 1];
+    if (last !== undefined && (last + ' ' + word).length <= max) lines[lines.length - 1] = last + ' ' + word;
+    else lines.push(word);
+  }
+  const out = lines.slice(0, 2).map((l) => (l.length > max + 2 ? l.slice(0, max + 1) + '…' : l));
+  if (lines.length > 2) out[1] = (out[1].length > max - 1 ? out[1].slice(0, max - 1) : out[1]) + '…';
+  return out;
+}
+
 /** The floor plan, drawn by the app itself so it works with no network. Pan with one finger, pinch to zoom. */
 export function MapView({ venue, route, from, to, children }: Props) {
   const box = useRef<HTMLDivElement>(null);
@@ -199,9 +212,20 @@ export function MapView({ venue, route, from, to, children }: Props) {
           {detail >= 2 && booths.map(({ b, c, font, big }) => (
             <text key={b.id} x={c[0]} y={c[1]} className={`lbl num${lit && !lit.has(b.id) ? ' dim' : ''}`} style={{ fontSize: font }}>
               {b.number}
-              {big && b.name && !route && <tspan x={c[0]} dy={font * 0.95} style={{ fontSize: font * 0.5 }}>{b.name.length > 16 ? b.name.slice(0, 15) + '…' : b.name}</tspan>}
             </text>
           ))}
+          {/* vendor names sit on a small white card under the number, wrapped by word, so they read on any booth colour */}
+          {detail >= 2 && !route && booths.filter(({ b, big }) => big && b.name).map(({ b, c, font }) => {
+            const f = font * 0.46, lines = wrapName(b.name!);
+            const w = Math.max(...lines.map((l) => l.length)) * f * 0.6 + f * 1.1, h = lines.length * f * 1.2 + f * 0.55;
+            const top = c[1] + font * 0.62;
+            return (
+              <g key={`n-${b.id}`} className="name-card">
+                <rect x={c[0] - w / 2} y={top} width={w} height={h} rx={f * 0.45} />
+                {lines.map((l, i) => <text key={i} x={c[0]} y={top + f * 0.275 + f * 1.2 * (i + 0.5)} className="lbl" style={{ fontSize: f }}>{l}</text>)}
+              </g>
+            );
+          })}
           {pins.map((p) => <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl pin">{p.text}</text>)}
           {startDot && <circle cx={startDot[0]} cy={startDot[1]} className="dot dot-from" />}
           {endDot && <circle cx={endDot[0]} cy={endDot[1]} className="dot dot-to" />}

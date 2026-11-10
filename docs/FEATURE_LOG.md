@@ -112,5 +112,5 @@ This block is the only part of the file that is edited in place. Update it whene
 
 ### 17:13 · Sheet gets a chevron and a full-width handle; route-type button stays reachable; larger logo · PR #16
 - **By:** Chandler, with Claude
-- **What changed:** The sheet's handle is now a full-width bar with a chevron button, so it can be tapped or dragged anywhere along the top; on iPhone the old small pill was the only part that responded. The route-type button moved beside the zoom controls, because with the sheet open it was hidden under the header, and its menu now draws over the whole screen. The Navcon logo is larger with more space above it and between it and the venue chip.
+- **What changed:** The sheet's handle is now a full-width bar with a chevron button, so it can be tapped or dragged anywhere along the top; on iPhone the old small pill was the only part that responded. The route-type button moved beside the zoom controls, because with the sheet open it was hidden under the header, and its menu now draws over the whole screen. The Navcon logo is larger with more space above it and between it and the venue chip. Vendor names on the map now sit on small white cards under the booth number, wrapped by word, so they read on any booth colour.
 - **State:** Open. Checked in phone-sized Chromium with touch input; not yet on a real iPhone.
