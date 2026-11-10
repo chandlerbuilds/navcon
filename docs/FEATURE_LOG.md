@@ -119,3 +119,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Chandler, with Claude
 - **What changed:** Area names that are too long for their shape (activation zones, the coffee bar, lounges) now sit on the same white card as vendor names, wrapped by word, in place of tiny text spilling onto the floor colour. The "HALL A/B/C" labels are about half the size and fainter, so they stop covering booths. During a route, a place that carries a route label (a step landmark, the start or the destination) no longer also shows its ordinary label underneath, which had produced doubled text such as "Seating" over "Seating"; a label that would sit under the start or end dot is lifted clear of it; restroom and entrance labels are smaller.
 - **State:** Open. Checked in desktop-sized Chromium on Halls A to C.
+
+### 17:25 · Map key, zone names and restroom signs · PR #17
+- **By:** Chandler, with Claude
+- **What changed:** A key button beside the route-type button opens a card with two lists: booth colour means sponsorship level (Diamond, Platinum, Gold, Silver, Start-up, End user, Media partner, as on the organizers' map), and floor colour means the named zone. The zone names (Cosmic Canyon, Amber Hive, Honeycomb Hub, Alpine Overlook, Starlight Summit, Astral Peak) are also written on the floor when zoomed out, because they match the large signs in the hall. Restrooms show the usual restroom sign in place of the letters "WC".
+- **State:** Open. Checked in phone-sized and desktop Chromium.

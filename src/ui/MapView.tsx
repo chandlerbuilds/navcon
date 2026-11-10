@@ -228,7 +228,18 @@ export function MapView({ venue, route, from, to, children }: Props) {
             );
           })}
           {detail >= 1 && venue.points.filter((p) => (p.kind === 'restroom' || p.kind === 'entrance') && !pinned.has(p.id)).map((p) => (
-            <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{p.kind === 'restroom' ? 'WC' : '▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
+            p.kind === 'restroom' ? (
+              // Restrooms are shown with the usual sign, not the letters "WC".
+              <g key={p.id} className="wc" transform={`translate(${p.at[0]} ${p.at[1]}) scale(0.085)`} role="img" aria-label="Restrooms">
+                <rect x="-21" y="-14" width="42" height="28" rx="6" />
+                <g className="wc-fig">
+                  <circle cx="-10" cy="-7.500" r="2.600" /><path d="M-10 -4 l-5 11 h3 v5 h4 v-5 h3 z" />
+                  <circle cx="10" cy="-7.500" r="2.600" /><path d="M6.500 -4 h7 v9 h-1.500 v7 h-4 v-7 h-1.500 z" />
+                </g>
+              </g>
+            ) : (
+              <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{'▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
+            )
           ))}
           {/* booth numbers stay during a route; vendor names are removed so only the route's own labels remain */}
           {detail >= 2 && booths.filter(({ b }) => !pinned.has(b.id)).map(({ b, c, font, big }) => (
@@ -248,6 +259,8 @@ export function MapView({ venue, route, from, to, children }: Props) {
               </g>
             );
           })}
+          {/* zone names, as on the large signs in each part of the hall; hidden once zoomed in to booth level and during a route */}
+          {detail <= 1 && !route && venue.zones.map((z) => { const c = centroid(z.poly); return <text key={`z-${z.id}`} x={c[0]} y={c[1]} className="lbl zone-name">{z.name.toUpperCase()}</text>; })}
           {pins.map((p) => <text key={p.id} x={p.at[0]} y={p.at[1]} className={underDot(p.at) ? 'lbl pin pin-up' : 'lbl pin'}>{p.text}</text>)}
           {startDot && <circle cx={startDot[0]} cy={startDot[1]} className="dot dot-from" />}
           {endDot && <circle cx={endDot[0]} cy={endDot[1]} className="dot dot-to" />}
