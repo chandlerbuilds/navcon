@@ -117,5 +117,5 @@ This block is the only part of the file that is edited in place. Update it whene
 
 ### 17:16 · Area names get cards too; hall labels are smaller and quieter · PR pending
 - **By:** Chandler, with Claude
-- **What changed:** Area names that are too long for their shape (activation zones, the coffee bar, lounges) now sit on the same white card as vendor names, wrapped by word, in place of tiny text spilling onto the floor colour. The "HALL A/B/C" labels are about half the size and fainter, so they stop covering booths.
+- **What changed:** Area names that are too long for their shape (activation zones, the coffee bar, lounges) now sit on the same white card as vendor names, wrapped by word, in place of tiny text spilling onto the floor colour. The "HALL A/B/C" labels are about half the size and fainter, so they stop covering booths. During a route, a place that carries a route label (a step landmark, the start or the destination) no longer also shows its ordinary label underneath, which had produced doubled text such as "Seating" over "Seating"; a label that would sit under the start or end dot is lifted clear of it; restroom and entrance labels are smaller.
 - **State:** Open. Checked in desktop-sized Chromium on Halls A to C.

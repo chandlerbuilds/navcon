@@ -77,7 +77,8 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .lbl { text-anchor: middle; dominant-baseline: central; pointer-events: none; fill: var(--ink); }
 .lbl.hall { font-size: 2.6px; font-weight: 750; letter-spacing: 0.08em; fill: #2b2a27; opacity: 0.5; }
 .lbl.area-name { font-weight: 600; fill: #3b3935; }
-.lbl.poi { font-size: 2.2px; font-weight: 700; fill: var(--brand); }
+.lbl.poi { font-size: 1.7px; font-weight: 700; fill: var(--brand); }
+.lbl.pin.pin-up { transform: translateY(calc(-19px * var(--ik, 1))); }
 .lbl.num { font-weight: 600; }
 .name-card { pointer-events: none; }
 .name-card rect { fill: #fff; fill-opacity: 0.94; stroke: rgb(28 27 25 / 0.28); stroke-width: calc(0.75px * var(--ik, 1)); }
