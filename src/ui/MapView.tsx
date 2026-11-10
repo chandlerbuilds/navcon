@@ -181,6 +181,10 @@ export function MapView({ venue, route, from, to, children }: Props) {
   const routePts = route ? pts(route.path) : '';
   const startDot = route ? route.path[0] : from?.center;
   const endDot = route ? route.path[route.path.length - 1] : to?.center;
+  // A place that carries a route label must not also show its ordinary label underneath: the two overlapped.
+  const pinned = useMemo(() => new Set(pins.map((p) => p.id)), [pins]);
+  // A label that would sit under the start or end dot is lifted clear of it.
+  const underDot = (at: Pt) => [startDot, endDot].some((d) => d && Math.hypot(d[0] - at[0], d[1] - at[1]) < 3);
 
   return (
     <div className="map" ref={box} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
@@ -199,17 +203,46 @@ export function MapView({ venue, route, from, to, children }: Props) {
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl hall">{p.name.toUpperCase()}</text>
           ))}
           {/* during a route, sponsor-named areas that are not part of it lose their name too; plain facilities keep theirs */}
-          {detail >= 1 && areas.filter(({ a }) => !(route && lit && !lit.has(a.id) && (a.kind === 'lounge' || (a.kind === 'food' && !a.name.startsWith('Meal'))))).map(({ a, c, tall, w }) => (
-            <text key={a.id} x={c[0]} y={c[1]} className={`lbl area-name${lit && !lit.has(a.id) ? ' dim' : ''}`}
-              transform={tall ? `rotate(-90 ${c[0]} ${c[1]})` : undefined} style={{ fontSize: Math.max(1.1, Math.min(2.4, w / (a.name.length * 0.62))) }}>
-              {a.name.replace(/ \(.*\)$/, '')}
-            </text>
-          ))}
-          {detail >= 1 && venue.points.filter((p) => p.kind === 'restroom' || p.kind === 'entrance').map((p) => (
-            <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{p.kind === 'restroom' ? 'WC' : '▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
+          {detail >= 1 && areas.filter(({ a }) => !(route && lit && !lit.has(a.id) && (a.kind === 'lounge' || (a.kind === 'food' && !a.name.startsWith('Meal'))))).map(({ a, c, tall, w }) => {
+            if (pinned.has(a.id)) return null;
+            const name = a.name.replace(/ \(.*\)$/, '');
+            const dim = lit && !lit.has(a.id) ? ' dim' : '';
+            // A name too long for its shape used to spill onto the floor colour at a tiny size.
+            // It now gets the same white card as vendor names, wrapped by word.
+            if (!tall && name.length * 0.62 * 1.5 > w) {
+              const f = 1.2, lines = wrapName(name);
+              const cw = Math.max(...lines.map((l) => l.length)) * f * 0.6 + f * 1.1, ch = lines.length * f * 1.2 + f * 0.55;
+              const top = c[1] - ch / 2;
+              return (
+                <g key={a.id} className={`name-card${dim}`}>
+                  <rect x={c[0] - cw / 2} y={top} width={cw} height={ch} rx={f * 0.45} />
+                  {lines.map((l, i) => <text key={i} x={c[0]} y={top + f * 0.275 + f * 1.2 * (i + 0.5)} className="lbl" style={{ fontSize: f }}>{l}</text>)}
+                </g>
+              );
+            }
+            return (
+              <text key={a.id} x={c[0]} y={c[1]} className={`lbl area-name${dim}`}
+                transform={tall ? `rotate(-90 ${c[0]} ${c[1]})` : undefined} style={{ fontSize: Math.max(1.1, Math.min(2.4, w / (name.length * 0.62))) }}>
+                {name}
+              </text>
+            );
+          })}
+          {detail >= 1 && venue.points.filter((p) => (p.kind === 'restroom' || p.kind === 'entrance') && !pinned.has(p.id)).map((p) => (
+            p.kind === 'restroom' ? (
+              // Restrooms are shown with the usual sign, not the letters "WC".
+              <g key={p.id} className="wc" transform={`translate(${p.at[0]} ${p.at[1]}) scale(0.085)`} role="img" aria-label="Restrooms">
+                <rect x="-21" y="-14" width="42" height="28" rx="6" />
+                <g className="wc-fig">
+                  <circle cx="-10" cy="-7.500" r="2.600" /><path d="M-10 -4 l-5 11 h3 v5 h4 v-5 h3 z" />
+                  <circle cx="10" cy="-7.500" r="2.600" /><path d="M6.500 -4 h7 v9 h-1.500 v7 h-4 v-7 h-1.500 z" />
+                </g>
+              </g>
+            ) : (
+              <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{'▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
+            )
           ))}
           {/* booth numbers stay during a route; vendor names are removed so only the route's own labels remain */}
-          {detail >= 2 && booths.map(({ b, c, font, big }) => (
+          {detail >= 2 && booths.filter(({ b }) => !pinned.has(b.id)).map(({ b, c, font, big }) => (
             <text key={b.id} x={c[0]} y={c[1]} className={`lbl num${lit && !lit.has(b.id) ? ' dim' : ''}`} style={{ fontSize: font }}>
               {b.number}
             </text>
@@ -226,7 +259,9 @@ export function MapView({ venue, route, from, to, children }: Props) {
               </g>
             );
           })}
-          {pins.map((p) => <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl pin">{p.text}</text>)}
+          {/* zone names, as on the large signs in each part of the hall; hidden once zoomed in to booth level and during a route */}
+          {detail <= 1 && !route && venue.zones.map((z) => { const c = centroid(z.poly); return <text key={`z-${z.id}`} x={c[0]} y={c[1]} className="lbl zone-name">{z.name.toUpperCase()}</text>; })}
+          {pins.map((p) => <text key={p.id} x={p.at[0]} y={p.at[1]} className={underDot(p.at) ? 'lbl pin pin-up' : 'lbl pin'}>{p.text}</text>)}
           {startDot && <circle cx={startDot[0]} cy={startDot[1]} className="dot dot-from" />}
           {endDot && <circle cx={endDot[0]} cy={endDot[1]} className="dot dot-to" />}
         </g>

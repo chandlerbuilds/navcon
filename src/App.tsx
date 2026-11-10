@@ -4,6 +4,7 @@ import { feet, PROFILE_LABEL, Router, type RouteOutcome } from './routing/route'
 import { track } from './telemetry';
 import { MapView } from './ui/MapView';
 import { ProfileMenu } from './ui/ProfileMenu';
+import { MapKey } from './ui/MapKey';
 import { IconOffline, IconPin, IconQr, IconSwap } from './ui/icons';
 import { SearchSheet } from './ui/SearchSheet';
 import type { Place, VenueBundle } from './venue/types';
@@ -147,6 +148,7 @@ export default function App() {
 
       <MapView venue={venue} route={route} from={from} to={to}>
         <ProfileMenu profile={profile} onChange={setProfile} />
+        <MapKey venue={venue} />
       </MapView>
 
       <section className={route ? (collapsed ? 'panel has-handle is-collapsed' : 'panel has-handle') : 'panel'} aria-label="Plan a route">
