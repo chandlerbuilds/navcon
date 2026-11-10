@@ -114,3 +114,8 @@ This block is the only part of the file that is edited in place. Update it whene
 - **By:** Chandler, with Claude
 - **What changed:** The sheet's handle is now a full-width bar with a chevron button, so it can be tapped or dragged anywhere along the top; on iPhone the old small pill was the only part that responded. The route-type button moved beside the zoom controls, because with the sheet open it was hidden under the header, and its menu now draws over the whole screen. The Navcon logo is larger with more space above it and between it and the venue chip. Vendor names on the map now sit on small white cards under the booth number, wrapped by word, so they read on any booth colour.
 - **State:** Open. Checked in phone-sized Chromium with touch input; not yet on a real iPhone.
+
+### 17:16 · Area names get cards too; hall labels are smaller and quieter · PR pending
+- **By:** Chandler, with Claude
+- **What changed:** Area names that are too long for their shape (activation zones, the coffee bar, lounges) now sit on the same white card as vendor names, wrapped by word, in place of tiny text spilling onto the floor colour. The "HALL A/B/C" labels are about half the size and fainter, so they stop covering booths.
+- **State:** Open. Checked in desktop-sized Chromium on Halls A to C.

@@ -75,7 +75,7 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .is-from { stroke: var(--from); stroke-width: calc(4px * var(--ik, 1)); opacity: 1; }
 .is-to { stroke: var(--to); stroke-width: calc(4px * var(--ik, 1)); opacity: 1; }
 .lbl { text-anchor: middle; dominant-baseline: central; pointer-events: none; fill: var(--ink); }
-.lbl.hall { font-size: 5px; font-weight: 800; fill: #2b2a27; opacity: 0.75; }
+.lbl.hall { font-size: 2.6px; font-weight: 750; letter-spacing: 0.08em; fill: #2b2a27; opacity: 0.5; }
 .lbl.area-name { font-weight: 600; fill: #3b3935; }
 .lbl.poi { font-size: 2.2px; font-weight: 700; fill: var(--brand); }
 .lbl.num { font-weight: 600; }

@@ -199,12 +199,29 @@ export function MapView({ venue, route, from, to, children }: Props) {
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl hall">{p.name.toUpperCase()}</text>
           ))}
           {/* during a route, sponsor-named areas that are not part of it lose their name too; plain facilities keep theirs */}
-          {detail >= 1 && areas.filter(({ a }) => !(route && lit && !lit.has(a.id) && (a.kind === 'lounge' || (a.kind === 'food' && !a.name.startsWith('Meal'))))).map(({ a, c, tall, w }) => (
-            <text key={a.id} x={c[0]} y={c[1]} className={`lbl area-name${lit && !lit.has(a.id) ? ' dim' : ''}`}
-              transform={tall ? `rotate(-90 ${c[0]} ${c[1]})` : undefined} style={{ fontSize: Math.max(1.1, Math.min(2.4, w / (a.name.length * 0.62))) }}>
-              {a.name.replace(/ \(.*\)$/, '')}
-            </text>
-          ))}
+          {detail >= 1 && areas.filter(({ a }) => !(route && lit && !lit.has(a.id) && (a.kind === 'lounge' || (a.kind === 'food' && !a.name.startsWith('Meal'))))).map(({ a, c, tall, w }) => {
+            const name = a.name.replace(/ \(.*\)$/, '');
+            const dim = lit && !lit.has(a.id) ? ' dim' : '';
+            // A name too long for its shape used to spill onto the floor colour at a tiny size.
+            // It now gets the same white card as vendor names, wrapped by word.
+            if (!tall && name.length * 0.62 * 1.5 > w) {
+              const f = 1.2, lines = wrapName(name);
+              const cw = Math.max(...lines.map((l) => l.length)) * f * 0.6 + f * 1.1, ch = lines.length * f * 1.2 + f * 0.55;
+              const top = c[1] - ch / 2;
+              return (
+                <g key={a.id} className={`name-card${dim}`}>
+                  <rect x={c[0] - cw / 2} y={top} width={cw} height={ch} rx={f * 0.45} />
+                  {lines.map((l, i) => <text key={i} x={c[0]} y={top + f * 0.275 + f * 1.2 * (i + 0.5)} className="lbl" style={{ fontSize: f }}>{l}</text>)}
+                </g>
+              );
+            }
+            return (
+              <text key={a.id} x={c[0]} y={c[1]} className={`lbl area-name${dim}`}
+                transform={tall ? `rotate(-90 ${c[0]} ${c[1]})` : undefined} style={{ fontSize: Math.max(1.1, Math.min(2.4, w / (name.length * 0.62))) }}>
+                {name}
+              </text>
+            );
+          })}
           {detail >= 1 && venue.points.filter((p) => p.kind === 'restroom' || p.kind === 'entrance').map((p) => (
             <text key={p.id} x={p.at[0]} y={p.at[1]} className="lbl poi">{p.kind === 'restroom' ? 'WC' : '▲ ' + p.name.replace(' Entrance', '').replace(/ \(.*\)$/, '')}</text>
           ))}
