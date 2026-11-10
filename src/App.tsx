@@ -139,7 +139,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="top brand">
-        <img src="/icon.svg" alt="" width={22} height={22} />
+        <img src="/icon.svg" alt="" width={28} height={28} />
         <strong>Navcon</strong>
         <span className="venue"><span className="venue-chip" title={venue.name}><IconPin size={13} />{venue.name}</span></span>
         {RADAR_KEY && venue.geo && <button className="link-btn" onClick={() => setArriving(true)}><IconPin size={16} />Getting here</button>}
@@ -149,7 +149,7 @@ export default function App() {
         <ProfileMenu profile={profile} onChange={setProfile} />
       </MapView>
 
-      <section className={collapsed && route ? 'panel is-collapsed' : 'panel'} aria-label="Plan a route">
+      <section className={route ? (collapsed ? 'panel has-handle is-collapsed' : 'panel has-handle') : 'panel'} aria-label="Plan a route">
         {route && (
           <button
             className="grabber"
@@ -164,7 +164,12 @@ export default function App() {
             }}
             onPointerUp={() => { dragY.current = null; }}
             onPointerCancel={() => { dragY.current = null; }}
-          ><span aria-hidden="true" /></button>
+          >
+            <span className="grabber-pill" aria-hidden="true" />
+            <svg className="grabber-chev" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d={collapsed ? 'M6 15l6-6 6 6' : 'M6 9l6 6 6-6'} />
+            </svg>
+          </button>
         )}
         {collapsed && route && (
           <button className="peek" onClick={() => setCollapsed(false)}>

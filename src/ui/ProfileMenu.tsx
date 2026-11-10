@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { Profile } from '../routing/grid';
 
 const OPTIONS: { id: Profile; label: string; hint: string }[] = [
@@ -39,6 +40,8 @@ interface Props { profile: Profile; onChange: (p: Profile) => void }
  */
 export function ProfileMenu({ profile, onChange }: Props) {
   const [open, setOpen] = useState(false);
+  const [at, setAt] = useState<React.CSSProperties>({ right: 12, bottom: 120 });
+  const menu = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const current = OPTIONS.find((o) => o.id === profile) ?? OPTIONS[0];
@@ -46,8 +49,8 @@ export function ProfileMenu({ profile, onChange }: Props) {
 
   useEffect(() => {
     if (!open) return;
-    root.current?.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
-    const outside = (e: PointerEvent) => { if (!root.current?.contains(e.target as Node)) setOpen(false); };
+    menu.current?.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
+    const outside = (e: PointerEvent) => { if (!root.current?.contains(e.target as Node) && !menu.current?.contains(e.target as Node)) setOpen(false); };
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') { setOpen(false); button.current?.focus(); } };
     document.addEventListener('pointerdown', outside, true);
     document.addEventListener('keydown', key);
@@ -58,7 +61,7 @@ export function ProfileMenu({ profile, onChange }: Props) {
   const arrows = (e: React.KeyboardEvent) => {
     if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
     e.preventDefault();
-    const items = [...(root.current?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]') ?? [])];
+    const items = [...(menu.current?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]') ?? [])];
     const i = items.indexOf(document.activeElement as HTMLButtonElement);
     items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length]?.focus();
   };
@@ -66,8 +69,8 @@ export function ProfileMenu({ profile, onChange }: Props) {
   return (
     // Stop the map underneath from treating a press here as the start of a pan.
     <div className="profile" ref={root} onPointerDown={(e) => e.stopPropagation()}>
-      {open && (
-        <div className="profile-menu" role="menu" aria-label="Route type" onKeyDown={arrows}>
+      {open && createPortal(
+        <div ref={menu} className="profile-menu" role="menu" aria-label="Route type" onKeyDown={arrows} style={at}>
           <p className="profile-title">Route type</p>
           {OPTIONS.map((o) => {
             const Icon = ICON[o.id];
@@ -80,7 +83,8 @@ export function ProfileMenu({ profile, onChange }: Props) {
               </button>
             );
           })}
-        </div>
+        </div>,
+        document.body,
       )}
       <button
         ref={button}
@@ -88,7 +92,17 @@ export function ProfileMenu({ profile, onChange }: Props) {
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={`Route type: ${current.label}. Change route type`}
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => {
+          // The menu is drawn over the whole screen, not inside the map, so a short map (sheet open)
+          // cannot clip it. It opens above the button when there is room, otherwise below it.
+          const r = button.current!.getBoundingClientRect();
+          const right = Math.max(8, window.innerWidth - r.right);
+          const H = 236;
+          if (r.top - 8 - H >= 8) setAt({ right, bottom: window.innerHeight - r.top + 8 });
+          else if (r.bottom + 8 + H <= window.innerHeight - 8) setAt({ right, top: r.bottom + 8 });
+          else setAt({ right, top: 8 });
+          setOpen((v) => !v);
+        }}
       >
         <Current />
         {profile !== 'standard' && <span className="profile-badge" aria-hidden="true"><IconCheck size={11} /></span>}
